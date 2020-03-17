@@ -62,6 +62,8 @@ def texts_to_dfs(texts, lang = None, method = "stanfordnlp", args = {"processor"
 
     
 if __name__ == "__main__":
+    # testing code
+
     # make some data
     with open("test_data/fyrtårnet.txt", "r") as f:
         text = f.read()
@@ -75,8 +77,3 @@ if __name__ == "__main__":
 
     dfs = texts_to_dfs(texts)
     dfs[0]
-    
-
-    
-
-    

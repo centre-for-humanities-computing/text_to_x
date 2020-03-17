@@ -132,3 +132,4 @@ dmypy.json
 stanfordnlp_resources/*
 stanfordnlp_resources
 nn
+.DS_Store

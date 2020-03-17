@@ -4,8 +4,8 @@ import types
 
 import numpy as np
 
-from utils import detect_lang_polyglot
-from methods.stanfordnlp_to_df import stanfordnlp_to_df
+from normalize_text_to_df.utils import detect_lang_polyglot
+from normalize_text_to_df.methods.stanfordnlp_to_df import stanfordnlp_to_df
 
 
 class TextToDf():

@@ -5,6 +5,9 @@ import types
 import numpy as np
 
 from normalize_text_to_df.utils import detect_lang_polyglot
+
+import os
+print(os.path.dirname(__file__))
 from normalize_text_to_df.methods.stanfordnlp_to_df import stanfordnlp_to_df
 
 class TextToDf():

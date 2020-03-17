@@ -1,9 +1,9 @@
-from setuptools import setup
+import setuptools
 
 with open("README.md", 'r') as f:
     long_description = f.read()
 
-setup(
+setuptools.setup(
    name='normalize_text_to_df',
    version='1.0',
    description='A pipeline for normalizing texts to dataframes',
@@ -13,7 +13,7 @@ setup(
    author='Kenneth C. Enevoldsen',
    author_email='kennethcenevoldsen@gmail.com',
    url="https://github.com/centre-for-humanities-computing/normalize_text_to_df",
-   packages=['normalize_text_to_df'],  #same as name
+   packages=setuptools.find_packages(), 
    install_requires=['numpy', 'pandas', 'stanfordnlp', 'polyglot'], #external packages as dependencies
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers

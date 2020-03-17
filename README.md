@@ -1,6 +1,12 @@
 # Normalize text to dataframe
 A pipeline for normalizing texts to dataframes.
 
+# Installation
+Install by running the following line:
+```
+pip3 install --force-reinstall --no-deps  git+https://github.com/centre-for-humanities-computing/normalize_text_to_df
+```
+
 # Example of use
 Let's start of by loading some data, we will use the Danish "fyrtårnet" by HC. Andersen
 ```{python}
@@ -17,7 +23,8 @@ texts = [t1, t2, t3]
 
 And the use is very simple:
 ```{python}
-dfs = texts_to_dfs(texts)
+import normalize_text_to_df as ttdf
+dfs = ttdf.texts_to_dfs(texts)
 ```
 ```
 Currently at text: 0
@@ -52,7 +59,7 @@ n_sent        token        lemma  upos xpos dependency relation
 
 The more extended use case is:
 ```
-texts_to_dfs(texts, lang = "da", method = "stanfordnlp", 
+dfs = ttdf.texts_to_dfs(texts, lang = "da", method = "stanfordnlp", 
              args = {"processor":"tokenize,mwt,lemma,pos,depparse"})
 ```
 Note that language can also be a list of languages.

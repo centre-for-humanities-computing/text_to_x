@@ -7,7 +7,6 @@ import numpy as np
 from normalize_text_to_df.utils import detect_lang_polyglot
 from normalize_text_to_df.methods.stanfordnlp_to_df import stanfordnlp_to_df
 
-
 class TextToDf():
     def __init__(self, texts, detect_lang_fun = "polyglot", lang = None, **kwargs):
         """

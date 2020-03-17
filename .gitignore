@@ -130,3 +130,5 @@ dmypy.json
 
 
 stanfordnlp_resources/*
+stanfordnlp_resources
+nn

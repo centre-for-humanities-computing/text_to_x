@@ -1,1 +1,1 @@
-from text_to_df import *
+from normalize_text_to_df.text_to_df import *

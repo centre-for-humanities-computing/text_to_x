@@ -4,7 +4,7 @@ A pipeline for normalizing texts to dataframes.
 # Installation
 Install by running the following line:
 ```
-pip3 install --force-reinstall --no-deps  git+https://github.com/centre-for-humanities-computing/normalize_text_to_df
+pip3 install  git+https://github.com/centre-for-humanities-computing/normalize_text_to_df
 ```
 
 # Example of use

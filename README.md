@@ -1,6 +1,7 @@
 # Text to X
 An quick an easy to use NLP pipeline
 
+---
 ## 🔧 Installation
 Install by running the following line:
 ```
@@ -11,6 +12,7 @@ To reinstall the package use the following code
 pip3 install --force-reinstall --no-deps  git+https://github.com/centre-for-humanities-computing/text_to_x
 ```
 
+---
 ## 📖 Normaliziation
 Normalization utilized stanfordNLP for tokenization, lemmatization, pos-tagging, dependency parsing.
 
@@ -75,6 +77,7 @@ dfs = ttd.texts_to_dfs(texts = texts)
 ```
 Note that language can also be a list of languages and if left out the language is detected using polyglot.
 
+---
 ## 🥳🤬 Sentiment Analysis 
 Text to X utilized an altered version of a dictionary or a multilingual BERT (not yet implented). For the dictionary approach it used an altered version of [vaderSentiment](https://github.com/cjhutto/vaderSentiment) allowing for multiple languages and use of tokenization og lemmatization derived from TextToDf.
 
@@ -113,7 +116,7 @@ df = tts.texts_to_sentiment(ttd)
     - [ ] add token_to_sentiment, which give the sentiment of each token
     - [ ] add sentence_to_sentiment, which give the sentiment of each sentence
 
-
+---
 ## 🎓 References: 
 >Qi, Peng and Zhang, Yuhao and Zhang, Yuhui and Bolton, Jason and Manning, Christopher D. (2020). Stanza: A {Python} Natural Language Processing Toolkit for Many Human Languages. arXiv
 

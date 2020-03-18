@@ -5,7 +5,6 @@ import types
 import numpy as np
 
 from normalize_text_to_df.utils import detect_lang_polyglot
-
 from normalize_text_to_df.methods.stanfordnlp_to_df import stanfordnlp_to_df
 
 class TextToDf():
@@ -13,6 +12,8 @@ class TextToDf():
         """
         texts (str|list): Should be a string, a list or other iterable object
         lang (str): language code, if None language is detected using polyglot.
+        method (str|fun): method used for normalization
+        args: arguments to be passed to the method
         """
 
         self.__detect_lang_fun_dict = {"polyglot": detect_lang_polyglot}

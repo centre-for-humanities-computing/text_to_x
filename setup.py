@@ -4,9 +4,9 @@ with open("README.md", 'r') as f:
     long_description = f.read()
 
 setuptools.setup(
-   name='normalize_text_to_df',
+   name='text_to_x',
    version='1.0',
-   description='A pipeline for normalizing texts to dataframes',
+   description='A pipeline for NLP tasks including normalization, sentiment analysis and topic modelling',
    license='MIT',
    long_description=long_description,
    long_description_content_type="text/markdown",

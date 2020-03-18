@@ -2,74 +2,93 @@
 """
 import pandas as pd
 
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-
-from text_to_sentiment.vaderSentiment.vaderSentiment_da import SentimentIntensityAnalyzer as SentimentIntensityAnalyzer_da
-from text_to_sentiment.utils import detect_lang_polyglot
-
+from text_to_x.vaderSentiment.vaderSentiment_en import SentimentIntensityAnalyzer as Sentiment_en
+from text_to_x.vaderSentiment.vaderSentiment_da import SentimentIntensityAnalyzer as Sentiment_da
+from text_to_x.utils import detect_lang_polyglot
+from text_to_x.text_to_df import TextToDf
 
 class TextToSentiment():
-    def __init__(self, texts, detect_lang_fun = "polyglot", lang = None):
+    def __init__(self,  lang = None, method = "dictionary", type_token = None, detect_lang_fun = "polyglot"):
         """
-        texts (str|list): Should be a string, a list or other iterable object
-        lang (str): language code, if None language is detected using polyglot
+        lang (str): language code, if None language is detected using detect_lang_fun (which defaults to polyglot).
+        detect_lang_fun (str|fun): fucntion to use for language detection. default is polyglot. But you can specify a user function, which return 
+        method ("dictionary"|"bert"|fun): method used for sentiment analysis
+        type_token (None|'lemma'|'token'): The type of token used. If None is chosen to be token automatically depending on method.
+        'lemma' for dictionary otherwise 'token'. Only used if a tokenlist or a TextToDf is passed to texts_to_sentiment()
         """
         self.__detect_lang_fun_dict = {"polyglot": detect_lang_polyglot}
-        self.sentiment_model = {}
 
-        if isinstance(texts, str):
-            texts = [texts]
+        if type_token is None:
+            self.type_token = 'lemma' if method == "dictionary" else 'token'
 
         if isinstance(detect_lang_fun, str):
             detect_lang_fun = self.__detect_lang_fun_dict[detect_lang_fun]
         elif not callable(detect_lang_fun):
             raise ValueError(f"detect_lang_fun should be a string or callable not a {type(detect_lang_fun)}")
         
-        if lang is None:
-            self.lang = [detect_lang_polyglot(text)[0] for text in texts]
-        else:
-            self.lang = lang
-                
-
-        self.texts = texts
-
-    def sentiment_score(self, method = "dictionary"):
+        self.lang = lang
         if method == "dictionary":
-            return self.__get_sent_dict()
+            self.method = self.__get_sent_dict
+        elif callable(method):
+            self.method = method
+        else: 
+            ValueError(f"The chosen method: {self.method}")
+
+    def texts_to_sentiment(self, texts):
+        """
+        texts (str|list|TextToDf): Should be a string, a list or other iterable object or an object of class TextToDf
+        """
+        tokenlist = None
+        if isinstance(texts, str):
+            texts = [texts]
+        if isinstance(texts, TextToDf):
+            tokenlist = [df[self.type_token] for df in texts.dfs]
+            if self.lang is None:
+                self.lang = texts.lang
+            texts = texts.texts
+        return self.method(texts, tokenlist)
     
-    def __get_sent_dict(self):
+    def __get_sent_dict(self, texts, tokenlist):
         if isinstance(self.lang, str):
             self.__fetch_sent_lang(self.lang)
-            res = [self.sentiment_model[self.lang](text) for text in self.texts]
+            if tokenlist is None:
+                res = [self.__dict_model[self.lang](text) for text in texts]
+            else:
+                res = [self.__dict_model[self.lang](text, tokens) for text, tokens in zip(texts,tokenlist)]
             return pd.DataFrame(res)
         else:
-            res = [self.__get_sent_dict_inner(text, l) for text, l in zip(self.texts, self.lang)]
+            res = []
+            loop_iter = zip(texts, self.lang) if tokenlist is None else zip(texts, self.lang, tokenlist)
+            for t in loop_iter:
+                if tokenlist is None:
+                    text, l = t
+                else:
+                    text, l, tokens = t
+                self.__fetch_sent_lang(l)
+                df = self.__dict_model[l](text, tokens)
+                df['lang'] = l
+                res.append(self.__dict_model[l](text))
             return pd.DataFrame(res)
         
-
-    def __get_sent_dict_inner(self, text, lang):
-        self.__fetch_sent_lang(lang)
-        res = self.sentiment_model[lang](text)
-        res['lang'] = lang
-        return res
-    
     def __fetch_sent_lang(self, lang):
-        if lang in self.sentiment_model:
+        self.__dict_model = {}
+        if lang in self.__dict_model:
             return None
         if lang == "en":
-            analyser = SentimentIntensityAnalyzer()
-            self.sentiment_model[lang] = analyser.polarity_scores
+            analyser = Sentiment_en()
+            self.__dict_model[lang] = analyser.polarity_scores
         elif lang == "da":
-            analyser = SentimentIntensityAnalyzer(lexicon_file="vader_lexicon.txt")
-            self.sentiment_model[lang] = analyser.polarity_scores
+            analyser = Sentiment_da()
+            self.__dict_model[lang] = analyser.polarity_scores
         else:
             raise ValueError("Language {lang} does not have a dictionary implemented")
 
 
-
-
 # testing code
 if __name__ == "__main__":
+    import os
+    os.getcwd()
+    os.chdir("..")
     # make some data
     with open("test_data/fyrtårnet.txt", "r") as f:
         text = f.read()
@@ -81,8 +100,18 @@ if __name__ == "__main__":
     # we will test it using a list but a single text will work as well
     texts = [t1, t2, t3]
 
-    tts = TextToSentiment(texts, lang = None)
-    tts.sentiment_score()
+    tts = TextToSentiment(lang = "da", method="dictionary")
+    df = tts.texts_to_sentiment(texts)
+    df
 
-df = pd.read_csv("vaderSentiment_NonEnglish/vader_lexicon_da.csv", encoding='ISO-8859-1')
-d = df.set_index("stem")[ 'score'].to_dict()
+    # with TextToDf
+    ttd = TextToDf()
+    ttd.texts_to_dfs(texts)
+
+    s = Sentiment_da()
+    [s.polarity_scores(text = text, tokenlist=df['lemma']) for text, df in zip(texts, ttd.dfs)]
+    tts = TextToSentiment(method="dictionary")
+    df = tts.texts_to_sentiment(ttd)
+
+
+

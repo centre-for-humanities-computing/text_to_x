@@ -1,13 +1,21 @@
-# Normalize text to dataframe
-A pipeline for normalizing texts to dataframes.
+# Text to X
+An quick an easy to use NLP pipeline
 
-# Installation
+## 🔧 Installation
 Install by running the following line:
 ```
-pip3 install --force-reinstall --no-deps  git+https://github.com/centre-for-humanities-computing/normalize_text_to_df
+pip3 install --force-reinstall --no-deps  git+https://github.com/centre-for-humanities-computing/text_to_x
+```
+To reinstall the package use the following code
+```
+pip3 install --force-reinstall --no-deps  git+https://github.com/centre-for-humanities-computing/text_to_x
 ```
 
-# Example of use
+## 📖 Normaliziation
+Normalization utilized stanfordNLP for tokenization, lemmatization, pos-tagging, dependency parsing.
+
+
+### Example of use
 Let's start of by loading some data, we will use the Danish "fyrtårnet" by HC. Andersen
 ```{python}
 with open("test_data/fyrtårnet.txt", "r") as f:
@@ -23,8 +31,9 @@ texts = [t1, t2, t3]
 
 And the use is very simple:
 ```{python}
-import normalize_text_to_df as ttdf
-dfs = ttdf.texts_to_dfs(texts)
+import text_to_x as ttx
+ttd = TextToDf()
+dfs = ttd.texts_to_dfs(texts)
 ```
 ```
 Currently at text: 0
@@ -35,6 +44,7 @@ With settings:
 ...
 Currently at text: 1
 Currently at text: 2
+Currently at text: 3
 ```
 
 Examining the output we see
@@ -57,9 +67,56 @@ n_sent        token        lemma  upos xpos dependency relation
 4       0  marcherende  marcherende  VERB    _               xcomp
 ```
 
-The more extended use case is:
+In the more extended use cases the you can modify the arguments more e.g.:
 ```
-dfs = ttdf.texts_to_dfs(texts, lang = "da", method = "stanfordnlp", 
-             args = {"processor":"tokenize,mwt,lemma,pos,depparse"})
+ttd = TextToDf(lang = ["da", "da", "da"], method = "stanfordnlp", 
+                args = {"processor":"tokenize,mwt,lemma,pos,depparse"})
+dfs = ttd.texts_to_dfs(texts = texts)
 ```
-Note that language can also be a list of languages.
+Note that language can also be a list of languages and if left out the language is detected using polyglot.
+
+## 🥳🤬 Sentiment Analysis 
+Text to X utilized an altered version of a dictionary or a multilingual BERT (not yet implented). For the dictionary approach it used an altered version of [vaderSentiment](https://github.com/cjhutto/vaderSentiment) allowing for multiple languages and use of tokenization og lemmatization derived from TextToDf.
+
+### Example of use
+The simple use case is (using the same texts as above):
+```
+tts = TextToSentiment(lang = "da", method="dictionary")
+df = tts.texts_to_sentiment(texts)
+print(df)
+```
+```
+neg    neu    pos  compound
+0  0.060  0.851  0.089    0.9794
+1  0.064  0.826  0.109    0.9973
+2  0.031  0.780  0.189    0.9615
+```
+
+If we want to use it with TextToDf we can do as follow:
+```
+# create the TextToDf
+ttd = TextToDf()
+ttd.texts_to_dfs(texts)
+
+# initialize the TextToSentiment
+tts = TextToSentiment(method="dictionary")
+
+# simply pass the ttd as the first argument
+df = tts.texts_to_sentiment(ttd)
+```
+
+---
+## 🚧 Future improvements
+- [ ] Update TextToDf to use Stanza instead of stanfordnlp
+- [ ] Make a class TextToTopic for topic modelling
+- [ ] Additions to the TextToSentiment class
+    - [ ] add token_to_sentiment, which give the sentiment of each token
+    - [ ] add sentence_to_sentiment, which give the sentiment of each sentence
+
+
+## 🎓 References: 
+>Qi, Peng and Zhang, Yuhao and Zhang, Yuhui and Bolton, Jason and Manning, Christopher D. (2020). Stanza: A {Python} Natural Language Processing Toolkit for Many Human Languages. arXiv
+
+>Hutto, C.J. & Gilbert, E.E. (2014). VADER: A Parsimonious Rule-based Model for Sentiment Analysis of Social Media Text. Eighth International Conference on Weblogs and Social Media (ICWSM-14). Ann Arbor, MI, June 2014.
+
+> Lauridsen, G. A., Dalsgaard, J. A., & Svendsen, L. K. B. (2019). SENTIDA: A New Tool for Sentiment Analysis in Danish. Journal of Language Works-Sprogvidenskabeligt Studentertidsskrift, 4(1), 38-53.

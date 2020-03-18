@@ -5,7 +5,7 @@ import numpy as np
 from polyglot.detect import Detector
 
 ### Defining Language detection
-def detect_lang_polyglot(text, print_error = False, raise_error = False, keep_unreliable = False):
+def detect_lang_polyglot(text, simplify = True, print_error = False, raise_error = False, keep_unreliable = False, **kwargs):
 
   """
   For detecting language using polyglot, but with exception handling
@@ -22,10 +22,14 @@ def detect_lang_polyglot(text, print_error = False, raise_error = False, keep_un
     detector = Detector(text, quiet=True)
     if detector.reliable or keep_unreliable:
       lang = detector.language
+      if simplify:
+        return lang.code
       return lang.code, lang.confidence
   except Exception as e:
     if print_error and not raise_error:
       print(e)
     if raise_error:
       raise Exception(e) 
+  if simplify:
+    return np.nan
   return np.nan, np.nan

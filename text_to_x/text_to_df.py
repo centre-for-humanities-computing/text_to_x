@@ -4,62 +4,56 @@ import types
 
 import numpy as np
 
-from normalize_text_to_df.utils import detect_lang_polyglot
-from normalize_text_to_df.methods.stanfordnlp_to_df import stanfordnlp_to_df
+from text_to_x.utils import detect_lang_polyglot
+from text_to_x.methods.stanfordnlp_to_df import stanfordnlp_to_df
 
 class TextToDf():
-    def __init__(self, texts, detect_lang_fun = "polyglot", lang = None, **kwargs):
+    def __init__(self, lang = None, method = "stanfordnlp", args = {"processor":"tokenize,mwt,lemma,pos,depparse"}, detect_lang_fun = "polyglot", **kwargs):
         """
-        texts (str|list): Should be a string, a list or other iterable object
-        lang (str): language code, if None language is detected using polyglot.
+        lang (str): language code, if None language is detected using detect_lang_fun (which defaults to polyglot).
+        detect_lang_fun (str|fun): fucntion to use for language detection. default is polyglot. But you can specify a user function, which return 
         method (str|fun): method used for normalization
-        args: arguments to be passed to the method
+        args (dict): arguments to be passed to the method
         """
-
         self.__detect_lang_fun_dict = {"polyglot": detect_lang_polyglot}
         self.__method_dict = {"stanfordnlp": stanfordnlp_to_df}
 
-        if isinstance(texts, str):
-            texts = [texts]
-
-
+        if isinstance(method, str):
+            self.method = self.__method_dict[method]
+        elif not callable(method):
+            ValueError(f"method should be a str or callable not a type: {type(method)}")
 
         if isinstance(detect_lang_fun, str):
-            detect_lang_fun = self.__detect_lang_fun_dict[detect_lang_fun]
+            self.detect_lang_fun = self.__detect_lang_fun_dict[detect_lang_fun]
         elif not callable(detect_lang_fun):
             raise ValueError(f"detect_lang_fun should be a string or callable not a {type(detect_lang_fun)}")
 
+        self.lang = lang
+        self.args = args
+        self.kwargs = kwargs
 
-        if lang is None:
-            self.lang = [detect_lang_polyglot(text)[0] for text in texts]
-        else:
-            self.lang = lang
-
-        self.texts = texts
-
-    def text_to_df(self, method = "stanfordnlp", args = {"processor":"tokenize,mwt,lemma,pos,depparse"}):
+    def texts_to_dfs(self, texts):
         """
-        method (str|fun): method used for normalization
-        args: arguments to be passed to the method
+        texts (str|list): Should be a string, a list or other iterable object
         """
+        if isinstance(texts, str):
+            texts = [texts]
 
-        if isinstance(method, str):
-            method = self.__method_dict[method]
-        elif not callable(method):
-            ValueError(f"method should be a str or callable not a type: {type(method)}")
+        if self.lang is None:
+            self.lang = [self.detect_lang_fun(text, **self.kwargs) for text in texts]
         
-        self.dfs = method(self.texts, self.lang, **args)
+        self.texts = texts
+        self.dfs = self.method(texts, self.lang, **self.args)
         return self.dfs
 
-def texts_to_dfs(texts, lang = None, method = "stanfordnlp", args = {"processor":"tokenize,mwt,lemma,pos,depparse"}, **kwargs):
+def texts_to_dfs(texts, lang = None, method = "stanfordnlp", args = {"processor":"tokenize,mwt,lemma,pos,depparse"}):
     """
-
-
+    texts (str|list): Should be a string, a list or other iterable object
     method (str|fun): method used for normalization, currently implemted
-    args: arguments to be passed to the method
+    args (dict): arguments to be passed to the method
     """
-    ttd = TextToDf(texts = text, lang = lang, **kwargs)
-    return ttd.text_to_df(method = method, **kwargs)
+    ttd = TextToDf(lang = lang, method = method, args = args)
+    return ttd.texts_to_dfs(texts = texts)
 
     
 if __name__ == "__main__":

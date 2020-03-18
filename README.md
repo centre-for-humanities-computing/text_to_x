@@ -4,7 +4,7 @@ An quick an easy to use NLP pipeline
 ## 🔧 Installation
 Install by running the following line:
 ```
-pip3 install --force-reinstall --no-deps  git+https://github.com/centre-for-humanities-computing/text_to_x
+pip3 install git+https://github.com/centre-for-humanities-computing/text_to_x
 ```
 To reinstall the package use the following code
 ```
@@ -120,3 +120,4 @@ df = tts.texts_to_sentiment(ttd)
 >Hutto, C.J. & Gilbert, E.E. (2014). VADER: A Parsimonious Rule-based Model for Sentiment Analysis of Social Media Text. Eighth International Conference on Weblogs and Social Media (ICWSM-14). Ann Arbor, MI, June 2014.
 
 > Lauridsen, G. A., Dalsgaard, J. A., & Svendsen, L. K. B. (2019). SENTIDA: A New Tool for Sentiment Analysis in Danish. Journal of Language Works-Sprogvidenskabeligt Studentertidsskrift, 4(1), 38-53.
+

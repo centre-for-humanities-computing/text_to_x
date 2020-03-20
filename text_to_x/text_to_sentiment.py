@@ -41,7 +41,7 @@ class TextToSentiment():
         tokenlist = None
         if isinstance(texts, list) and not isinstance(texts[0], str):
             # One may accidentally pass the list of preprocessed data frames
-            raise ValueError(f"When 'texts' is a list, it must contain strings only.")
+            raise TypeError(f"When 'texts' is a list, it must contain strings only.")
         if isinstance(texts, str):
             texts = [texts]
         if isinstance(texts, TextToDf):

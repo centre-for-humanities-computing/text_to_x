@@ -36,9 +36,12 @@ class TextToSentiment():
 
     def texts_to_sentiment(self, texts):
         """
-        texts (str|list|TextToDf): Should be a string, a list or other iterable object or an object of class TextToDf
+        texts (str|list|TextToDf): Should be a string, a list of strings or other iterable object or an object of class TextToDf
         """
         tokenlist = None
+        if isinstance(texts, list) and not isinstance(texts[0], str):
+            # One may accidentally pass the list of preprocessed data frames
+            raise ValueError(f"When 'texts' is a list, it must contain strings only.")
         if isinstance(texts, str):
             texts = [texts]
         if isinstance(texts, TextToDf):

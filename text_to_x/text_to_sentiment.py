@@ -24,7 +24,7 @@ class TextToSentiment():
         if isinstance(detect_lang_fun, str):
             detect_lang_fun = self.__detect_lang_fun_dict[detect_lang_fun]
         elif not callable(detect_lang_fun):
-            raise ValueError(f"detect_lang_fun should be a string or callable not a {type(detect_lang_fun)}")
+            raise TypeError(f"detect_lang_fun should be a string or callable not a {type(detect_lang_fun)}")
         
         self.lang = lang
         if method == "dictionary":
@@ -32,13 +32,16 @@ class TextToSentiment():
         elif callable(method):
             self.method = method
         else: 
-            ValueError(f"The chosen method: {self.method}")
+            raise ValueError(f"The chosen method: {self.method}")
 
     def texts_to_sentiment(self, texts):
         """
-        texts (str|list|TextToDf): Should be a string, a list or other iterable object or an object of class TextToDf
+        texts (str|list|TextToDf): Should be a string, a list of strings or other iterable object or an object of class TextToDf
         """
         tokenlist = None
+        if isinstance(texts, list) and not isinstance(texts[0], str):
+            # One may accidentally pass the list of preprocessed data frames
+            raise ValueError(f"When 'texts' is a list, it must contain strings only.")
         if isinstance(texts, str):
             texts = [texts]
         if isinstance(texts, TextToDf):

@@ -110,8 +110,10 @@ df = tts.texts_to_sentiment(ttd)
 
 ---
 ## 🚧 Future improvements
+In estimated order
+- [ ] Make a class TextToTopic for topic modelling using gensim mallet
+- [ ] Add entity tagger
 - [ ] Update TextToDf to use Stanza instead of stanfordnlp
-- [ ] Make a class TextToTopic for topic modelling
 - [ ] Additions to the TextToSentiment class
     - [ ] add token_to_sentiment, which give the sentiment of each token
     - [ ] add sentence_to_sentiment, which give the sentiment of each sentence

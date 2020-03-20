@@ -21,12 +21,12 @@ class TextToDf():
         if isinstance(method, str):
             self.method = self.__method_dict[method]
         elif not callable(method):
-            ValueError(f"method should be a str or callable not a type: {type(method)}")
+            raise TypeError(f"method should be a str or callable not a type: {type(method)}")
 
         if isinstance(detect_lang_fun, str):
             self.detect_lang_fun = self.__detect_lang_fun_dict[detect_lang_fun]
         elif not callable(detect_lang_fun):
-            raise ValueError(f"detect_lang_fun should be a string or callable not a {type(detect_lang_fun)}")
+            raise TypeError(f"detect_lang_fun should be a string or callable not a {type(detect_lang_fun)}")
 
         self.lang = lang
         self.args = args

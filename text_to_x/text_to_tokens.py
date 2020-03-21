@@ -43,7 +43,8 @@ class TextToTokens(TextTo):
             "casing" : casing
         }
         self.__preprocessor_args = {"processor": ",".join(
-            [procss for procss, flag in self.preprocessors.items() if flag and procss not in ["stem","casing"]])}
+            [procss for procss, flag in self.preprocessors.items() if \
+                flag and procss not in ["stem","casing"]])}
         
         self.dfs = None
 
@@ -127,15 +128,8 @@ if __name__ == "__main__":
     # testing code
 
     # make some data
-    with open("test_data/fyrtårnet.txt", "r") as f:
-        text = f.read()
-        # just some splits som that the text aren't huge
-    t1 = "\n".join([t for t in text.split("\n")[1:50] if t])
-    t2 = "\n".join([t for t in text.split("\n")[50:100] if t])
-    t3 = "\n".join([t for t in text.split("\n")[100:150] if t])
-
-    # we will test it using a list but a single text will work as well
-    texts = [t1, t2, t3]
+    from text_to_x.utils import get_test_data
+    texts = get_test_data()
 
     ttd = TextToTokens(lang = "da")
     dfs = ttd.texts_to_tokens(texts)

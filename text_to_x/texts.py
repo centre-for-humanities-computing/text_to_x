@@ -88,7 +88,7 @@ class Texts(TextTo):
             mwt = mwt,
             depparse = depparse,
             casing = casing)
-        self.__preprocessed_texts = self.__preprocessed_ttt.texts_to_dfs(
+        self.__preprocessed_texts = self.__preprocessed_ttt.texts_to_tokens(
             texts = self.raw_texts, silent = silent)
         self.is_preprocessed = True
 

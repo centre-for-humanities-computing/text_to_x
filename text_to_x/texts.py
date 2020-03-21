@@ -7,6 +7,7 @@ import pandas as pd
 
 from text_to_x.text_to_tokens import TextToTokens
 from text_to_x.text_to_sentiment import TextToSentiment
+from text_to_x.text_to_vocab import TextToVocab
 from text_to_x.text_to import TextTo
 
 class Texts(TextTo):
@@ -47,6 +48,8 @@ class Texts(TextTo):
         self.__sentiment_scores = None
         self.__preprocessed_texts = None
         self.is_preprocessed = False
+        self.__token_counters = None
+        self.__vocabs = None
         
         # Detect language if not specified
         self._detect_language(self.raw_texts)
@@ -107,6 +110,31 @@ class Texts(TextTo):
         return self._get(self.__preprocessed_texts, 
                          "The preprocess() method has not been called yet.")
 
+    def extract_vocabulary(self, type_token = "token", lower = False):
+        """
+        Creates a token counter (term frequency) and a vocabulary for each text.
+        Get result with get_vocabularies() or get_token_counters().
+
+        type_token (str): Either 'token', 'lemma', or 'stem'.
+        lower (bool): Whether to lowercase the tokens first.
+        """
+        if type_token == "token":
+            required_process = "tokenize"
+        else:
+            required_process = type_token
+        self.__check_preprocessed("extract_vocabulary()", [required_process])
+        ttv = TextToVocab(type_token = type_token)
+        self.__token_counters, self.__vocabs = ttv.texts_to_vocabs(
+            self.__preprocessed_texts, lower = lower)
+
+    def get_vocabularies(self):
+        return self._get(self.__vocabs, 
+                         "The extract_vocabulary() method has not been called yet.")
+
+    def get_token_counters(self):
+        return self._get(self.__token_counters, 
+                         "The extract_vocabulary() method has not been called yet.")
+
     def score_sentiment(self, method = "dictionary", type_token = None):
         """
         method ("dictionary"|"bert"|fun): method used for sentiment analysis
@@ -152,14 +180,14 @@ if __name__ == "__main__":
     tt = Texts(texts, lang = "da")
     tt.preprocess(silent = True)
     dfs = tt.get_preprocessed_texts()
+    # Extract vocabulary and token counter (term frequency)
+    tt.extract_vocabulary()
+    tf = tt.get_token_counters()
+    vcb = tt.get_vocabularies()
     # Score sentiment
     tt.score_sentiment()
     df = tt.get_sentiments()
     # Topic modeling
     # tt.model_topics()
-
-
-    
-
 
     

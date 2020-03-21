@@ -38,7 +38,7 @@ class TextToSentiment(TextTo):
         assert isinstance(texts, (TextToTokens, str, list)), \
             "'texts' must be str, list of strings or TextToTokens object."
         if isinstance(texts, TextToTokens):
-            tokenlist = [df[self.type_token] for df in texts.dfs]
+            tokenlist = [df[self.type_token] for df in texts.get_token_dfs()]
             if self.lang is None:
                 self.lang = texts.lang
             texts = texts.texts
@@ -112,7 +112,7 @@ if __name__ == "__main__":
     ttt.texts_to_tokens(texts)
 
     s = Sentiment_da()
-    [s.polarity_scores(text = text, tokenlist=df['lemma']) for text, df in zip(texts, ttt.dfs)]
+    [s.polarity_scores(text = text, tokenlist=df['lemma']) for text, df in zip(texts, ttt.get_token_dfs())]
     tts = TextToSentiment(method="dictionary")
     df = tts.texts_to_sentiment(ttt)
 

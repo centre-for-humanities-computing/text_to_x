@@ -15,6 +15,9 @@ class TextTo():
     # Private methods
 
     def __prepare_language_detector(self):
+        if self.lang == -1:
+            # Child class does not use language
+            return None
         self.__detect_lang_fun_dict = {"polyglot": detect_lang_polyglot}
         if isinstance(self._detect_lang_fun, str):
             if self._detect_lang_fun not in self.__detect_lang_fun_dict:

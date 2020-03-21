@@ -46,7 +46,7 @@ class TextToTokens(TextTo):
             procss for procss, flag in self.preprocessors.items() if \
                 flag and (procss not in {"stem","casing"}))}
         
-        self.dfs = None
+        self.__dfs = None
 
         self.__method_dict = {"stanza": stanza_to_df}
         if isinstance(method, str):
@@ -69,14 +69,18 @@ class TextToTokens(TextTo):
             self.method = silence(self.method)
 
         self.texts = texts
-        self.dfs = self.method(texts, self.lang, **self.__preprocessor_args)
+        self.__dfs = self.method(texts, self.lang, **self.__preprocessor_args)
         if self.preprocessors['stem']:
             self.__stem(**self._kwargs)
         if self.preprocessors['casing']:
             self.__extract_casing()
         if silent:
             self.method = sav
-        return self.dfs
+        return self.__dfs
+
+    def get_token_dfs(self):
+        return self._get(self.__dfs,
+                         "The texts_to_tokens() method has not been called yet.")
 
     def __get_stemmer(self, stemmer, lang):
         """
@@ -96,7 +100,7 @@ class TextToTokens(TextTo):
     def __stem(self, stemmer = "snowball", **kwargs):
         if isinstance(self.lang, str):
             self.__get_stemmer(stemmer, self.lang)
-            for df in self.dfs:
+            for df in self.__dfs:
                 df['stem'] = [self.stemmer(token) for token in df['token']]
         else:
             for i, l in enumerate(self.lang):
@@ -105,7 +109,7 @@ class TextToTokens(TextTo):
                     self.__get_stemmer(stemmer, lang)
                 elif l != lang:
                     self.__get_stemmer(stemmer, lang)
-                self.dfs[i]['stem'] = [self.stemmer(token) for token in self.dfs[i]['token']]
+                self.__dfs[i]['stem'] = [self.stemmer(token) for token in self.__dfs[i]['token']]
 
     def __extract_casing(self):
         """
@@ -120,7 +124,7 @@ class TextToTokens(TextTo):
                 lambda r: int((r['upper_cased']+r['lower_cased']) == 0), 
                 axis = 1)
             return df
-        self.dfs = [casings_single_df(df) for df in self.dfs]
+        self.__dfs = [casings_single_df(df) for df in self.__dfs]
             
 
         

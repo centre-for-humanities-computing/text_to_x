@@ -70,7 +70,8 @@ def stanfordnlp_to_df(texts, langs, stanfordnlp_path = None, silent = False, **k
         doc = s_nlp(text)
         
         # extract from doc
-        l = ( (n_sent, word.text, word.lemma, word.upos, word.xpos, word.dependency_relation) for n_sent, sent in enumerate(doc.sentences) for word in sent.words)
+        l = ( (n_sent, word.text, word.lemma, word.upos, word.xpos, word.dependency_relation) for \
+            n_sent, sent in enumerate(doc.sentences) for word in sent.words)
         df = pd.DataFrame(l, columns = ["n_sent", "token", "lemma", "upos", "xpos", "dependency relation"])
         df['lang'] = lang
         res.append(df)

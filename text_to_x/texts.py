@@ -5,7 +5,7 @@ import warnings
 
 import pandas as pd
 
-from text_to_x.text_to_df import TextToDf
+from text_to_x.text_to_token import TextToToken
 from text_to_x.text_to_sentiment import TextToSentiment
 from text_to_x.text_to import TextTo
 
@@ -60,8 +60,13 @@ class Texts(TextTo):
             raise RuntimeError(f"{method_name} requires these preprocessing steps: {required_processes}")
 
     def preprocess(self, 
-                   preprocess_method = "stanfordnlp", 
-                   preprocessors = ["tokenize", "mwt", "lemma", "pos", "depparse", "stem"],
+                   preprocess_method = "stanfordnlp",
+                   lemmatize = True,
+                   stem = False,
+                   pos = False,
+                   mwt = False,
+                   depparse = False,
+                   casing = False,
                    silent = False):
         """
         preprocess_method (str|fun): method used for normalization
@@ -74,12 +79,15 @@ class Texts(TextTo):
             warnings.warn("Overwriting previous preprocessing.")
 
         self.__preprocess_method = preprocess_method
-        self.preprocessors = preprocessors
-
-        self.__preprocessed_ttd = TextToDf(
+        self.__preprocessed_ttd = TextToToken(
             lang = self.lang, 
             method = self.__preprocess_method, 
-            args = preprocessors)
+            lemmatize = lemmatize,
+            stem = stem,
+            pos = pos,
+            mwt = mwt,
+            depparse = depparse,
+            casing = casing)
         self.__preprocessed_texts = self.__preprocessed_ttd.texts_to_dfs(
             texts = self.raw_texts, silent = silent)
         self.is_preprocessed = True

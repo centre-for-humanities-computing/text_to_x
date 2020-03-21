@@ -12,10 +12,18 @@ from text_to_x.methods.stanfordnlp_to_df import stanfordnlp_to_df
 from text_to_x.text_to import TextTo
 
 
-class TextToDf(TextTo):
-    def __init__(self, lang = None, method = "stanfordnlp", 
-                 args = ["tokenize", "mwt", "lemma", "pos", "depparse", "stem"], 
-                 detect_lang_fun = "polyglot", **kwargs):
+class TextToToken(TextTo):
+    def __init__(self, lang = None, 
+                 method = "stanfordnlp",
+                 lemmatize = True,
+                 stem = False,
+                 pos = False,
+                 mwt = False,
+                 depparse = False,
+                 casing = False,
+                 silent = False,
+                 detect_lang_fun = "polyglot", 
+                 **kwargs):
         """
         lang (str): language code(s), if None language is detected using detect_lang_fun (which defaults to polyglot). Can be a list of codes.
         detect_lang_fun (str|fun): fucntion to use for language detection. default is polyglot. But you can specify a user function, which return 
@@ -25,14 +33,22 @@ class TextToDf(TextTo):
         super().__init__(lang = lang, kwargs = kwargs, 
                          detect_lang_fun = detect_lang_fun)
         
-        self.__method_dict = {"stanfordnlp": stanfordnlp_to_df}
-        self.args = args
+        self.preprocessors = {
+            "tokenize" : True,
+            "lemma" : lemmatize,
+            "stem" : stem,
+            "mwt" : mwt, 
+            "pos" : pos, 
+            "depparse" : depparse,
+            "casing" : casing
+        }
+        self.__preprocessor_args = {"processor": ",".join(
+            [procss for procss, flag in self.preprocessors.items() if flag])}
+        print(self.__preprocessor_args)
+        
         self.dfs = None
 
-        if 'tokenize' not in args:
-            args.append('tokenize')
-        self.__preprocessor_args = {"processor": ",".join(self.args)}
-
+        self.__method_dict = {"stanfordnlp": stanfordnlp_to_df}
         if isinstance(method, str):
             self.method = self.__method_dict[method]
         elif not callable(method):
@@ -54,8 +70,10 @@ class TextToDf(TextTo):
 
         self.texts = texts
         self.dfs = self.method(texts, self.lang, **self.__preprocessor_args)
-        if 'stem' in self.args:
+        if self.preprocessors['stem']:
             self.__stem(**self._kwargs)
+        if self.preprocessors['casing']:
+            self.__extract_casing()
         if silent:
             self.method = sav
         return self.dfs
@@ -89,6 +107,23 @@ class TextToDf(TextTo):
                     self.__get_stemmer(stemmer, lang)
                 self.dfs[i]['stem'] = [self.stemmer(token) for token in self.dfs[i]['token']]
 
+    def __extract_casing(self):
+        """
+        Whether token is title cased, upper cased, lower cased, or mixed cased.
+        Note: Title cased is also mixed cased.
+        """
+        def casings_single_df(df):
+            df['title_cased'] = [int(token.istitle()) for token in df['token']]
+            df['upper_cased'] = [int(token.isupper()) for token in df['token']]
+            df['lower_cased'] = [int(token.islower()) for token in df['token']]
+            df['mixed_cased'] = df.apply(
+                lambda r: int((r['upper_cased']+r['lower_cased']) == 0), 
+                axis = 1)
+            return df
+        self.dfs = [casings_single_df(df) for df in self.dfs]
+            
+
+
 
         
 if __name__ == "__main__":
@@ -105,6 +140,6 @@ if __name__ == "__main__":
     # we will test it using a list but a single text will work as well
     texts = [t1, t2, t3]
 
-    ttd = TextToDf(lang = "da")
+    ttd = TextToToken(lang = "da")
     dfs = ttd.texts_to_dfs(texts)
 

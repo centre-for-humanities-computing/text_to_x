@@ -50,7 +50,6 @@ def silence(func):
 
     return func_wrapper
 
-
 def get_test_data():
     with open("test_data/fyrtårnet.txt", "r") as f:
         text = f.read()

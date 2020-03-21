@@ -5,7 +5,7 @@ import warnings
 
 import pandas as pd
 
-from text_to_x.text_to_token import TextToToken
+from text_to_x.text_to_tokens import TextToTokens
 from text_to_x.text_to_sentiment import TextToSentiment
 from text_to_x.text_to import TextTo
 
@@ -60,7 +60,7 @@ class Texts(TextTo):
             raise RuntimeError(f"{method_name} requires these preprocessing steps: {required_processes}")
 
     def preprocess(self, 
-                   preprocess_method = "stanfordnlp",
+                   preprocess_method = "stanza",
                    lemmatize = True,
                    stem = False,
                    pos = False,
@@ -79,7 +79,7 @@ class Texts(TextTo):
             warnings.warn("Overwriting previous preprocessing.")
 
         self.__preprocess_method = preprocess_method
-        self.__preprocessed_ttd = TextToToken(
+        self.__preprocessed_ttt = TextToTokens(
             lang = self.lang, 
             method = self.__preprocess_method, 
             lemmatize = lemmatize,
@@ -88,7 +88,7 @@ class Texts(TextTo):
             mwt = mwt,
             depparse = depparse,
             casing = casing)
-        self.__preprocessed_texts = self.__preprocessed_ttd.texts_to_dfs(
+        self.__preprocessed_texts = self.__preprocessed_ttt.texts_to_dfs(
             texts = self.raw_texts, silent = silent)
         self.is_preprocessed = True
 
@@ -109,7 +109,7 @@ class Texts(TextTo):
         """
         self.__check_preprocessed("score_sentiment()", ["tokenize","lemma"])
         tts = TextToSentiment(lang=self.lang, method=method, type_token=type_token)
-        self.__sentiment_scores = tts.texts_to_sentiment(self.__preprocessed_ttd)
+        self.__sentiment_scores = tts.texts_to_sentiment(self.__preprocessed_ttt)
 
     def get_sentiments(self):
         return self._get(self.__sentiment_scores, 

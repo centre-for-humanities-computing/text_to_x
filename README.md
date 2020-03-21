@@ -34,8 +34,8 @@ texts = [t1, t2, t3]
 And the use is very simple:
 ```{python}
 import text_to_x as ttx
-ttd = TextToDf()
-dfs = ttd.texts_to_dfs(texts)
+ttt = TextToTokens()
+dfs = ttt.texts_to_tokens(texts)
 ```
 ```
 Currently at text: 0
@@ -71,9 +71,9 @@ n_sent        token        lemma  upos xpos dependency relation
 
 In the more extended use cases the you can modify the arguments more e.g.:
 ```
-ttd = TextToDf(lang = ["da", "da", "da"], method = "stanfordnlp", 
-                args = {"processor":"tokenize,mwt,lemma,pos,depparse"})
-dfs = ttd.texts_to_dfs(texts = texts)
+ttt = TextToTokens(lang = ["da", "da", "da"], method = "stanza", 
+                args = {"processors":"tokenize,mwt,lemma,pos,depparse"})
+dfs = ttt.texts_to_tokens(texts = texts)
 ```
 Note that language can also be a list of languages and if left out the language is detected using polyglot.
 
@@ -97,23 +97,24 @@ neg    neu    pos  compound
 
 If we want to use it with TextToDf we can do as follow:
 ```
-# create the TextToDf
-ttd = TextToDf()
-ttd.texts_to_dfs(texts)
+# create the TextToTokens
+ttt = TextToTokens()
+ttt.texts_to_tokens(texts)
 
 # initialize the TextToSentiment
 tts = TextToSentiment(method="dictionary")
 
-# simply pass the ttd as the first argument
-df = tts.texts_to_sentiment(ttd)
+# simply pass the ttt as the first argument
+df = tts.texts_to_sentiment(ttt)
 ```
 
 ---
 ## 🚧 Future improvements
 In estimated order
 - [ ] Make a class TextToTopic for topic modelling using gensim mallet
-- [ ] Add entity tagger
-- [ ] Update TextToDf to use Stanza instead of stanfordnlp
+- [x] Add entity tagger
+    - [ ] add entity tagger for Danish
+- [x] Update TextToDf to use Stanza instead of stanfordnlp
 - [ ] Additions to the TextToSentiment class
     - [ ] add token_to_sentiment, which give the sentiment of each token
     - [ ] add sentence_to_sentiment, which give the sentiment of each sentence

@@ -4,7 +4,7 @@ import pandas as pd
 
 from text_to_x.vaderSentiment.vaderSentiment_en import SentimentIntensityAnalyzer as Sentiment_en
 from text_to_x.vaderSentiment.vaderSentiment_da import SentimentIntensityAnalyzer as Sentiment_da
-from text_to_x.text_to_token import TextToToken
+from text_to_x.text_to_tokens import TextToTokens
 from text_to_x.text_to import TextTo
 
 class TextToSentiment(TextTo):
@@ -35,9 +35,9 @@ class TextToSentiment(TextTo):
         texts (str|list|TextToDf): Should be a string, a list of strings or other iterable object or an object of class TextToDf
         """
         tokenlist = None
-        assert isinstance(texts, (TextToToken, str, list)), \
-            "'texts' must be str, list of strings or TextToDf."
-        if isinstance(texts, TextToToken):
+        assert isinstance(texts, (TextToTokens, str, list)), \
+            "'texts' must be str, list of strings or TextToTokens object."
+        if isinstance(texts, TextToTokens):
             tokenlist = [df[self.type_token] for df in texts.dfs]
             if self.lang is None:
                 self.lang = texts.lang
@@ -108,13 +108,13 @@ if __name__ == "__main__":
     df
 
     # with TextToDf
-    ttd = TextToToken()
-    ttd.texts_to_dfs(texts)
+    ttt = TextToTokens()
+    ttt.texts_to_tokens(texts)
 
     s = Sentiment_da()
-    [s.polarity_scores(text = text, tokenlist=df['lemma']) for text, df in zip(texts, ttd.dfs)]
+    [s.polarity_scores(text = text, tokenlist=df['lemma']) for text, df in zip(texts, ttt.dfs)]
     tts = TextToSentiment(method="dictionary")
-    df = tts.texts_to_sentiment(ttd)
+    df = tts.texts_to_sentiment(ttt)
 
 
 

@@ -8,13 +8,13 @@ from nltk.stem.snowball import SnowballStemmer
 from nltk.stem.snowball import PorterStemmer
 
 from text_to_x.utils import silence
-from text_to_x.methods.stanfordnlp_to_df import stanfordnlp_to_df
+from text_to_x.methods.stanza_to_df import stanza_to_df
 from text_to_x.text_to import TextTo
 
 
-class TextToToken(TextTo):
+class TextToTokens(TextTo):
     def __init__(self, lang = None, 
-                 method = "stanfordnlp",
+                 method = "stanza",
                  lemmatize = True,
                  stem = False,
                  pos = False,
@@ -47,13 +47,13 @@ class TextToToken(TextTo):
         
         self.dfs = None
 
-        self.__method_dict = {"stanfordnlp": stanfordnlp_to_df}
+        self.__method_dict = {"stanza": stanza_to_df}
         if isinstance(method, str):
             self.method = self.__method_dict[method]
         elif not callable(method):
             raise TypeError(f"method should be a str or callable not a type: {type(method)}")
 
-    def texts_to_dfs(self, texts, silent = True):
+    def texts_to_tokens(self, texts, silent = True):
         """
         texts (str|list): Should be a string, a list or other iterable object
         """
@@ -122,8 +122,6 @@ class TextToToken(TextTo):
         self.dfs = [casings_single_df(df) for df in self.dfs]
             
 
-
-
         
 if __name__ == "__main__":
     # testing code
@@ -139,6 +137,6 @@ if __name__ == "__main__":
     # we will test it using a list but a single text will work as well
     texts = [t1, t2, t3]
 
-    ttd = TextToToken(lang = "da")
-    dfs = ttd.texts_to_dfs(texts)
+    ttd = TextToTokens(lang = "da")
+    dfs = ttd.texts_to_tokens(texts)
 

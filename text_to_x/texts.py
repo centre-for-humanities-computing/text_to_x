@@ -5,11 +5,11 @@ import warnings
 
 import pandas as pd
 
-from text_to_x.text_to_df import TextToDf
+from text_to_x.text_to_tokens import TextToTokens
 from text_to_x.text_to_sentiment import TextToSentiment
 from text_to_x.utils import detect_lang_polyglot
 
-class Texts():
+class TextTo():
     def __init__(self, texts, 
                  language = None,  
                  detect_lang_fun = "polyglot", 
@@ -25,7 +25,7 @@ class Texts():
         >>> t1 = '\\n'.join([t for t in text.split('\\n')[1:50] if t]) # take subset of data
         >>> t2 = '\\n'.join([t for t in text.split('\\n')[50:100] if t])
         >>> texts = [t1, t2]
-        >>> tt = Texts(texts, languages = "da") # make text class
+        >>> tt = TextTo(texts, languages = "da") # make text class
         >>> tt.preprocess(silent = True)
         ...
         >>> dfs = tt.get_preprocessed_texts()
@@ -72,8 +72,8 @@ class Texts():
             raise RuntimeError(f"{method_name} requires these preprocessing steps: {required_processes}")
 
     def preprocess(self, 
-                   preprocess_method = "stanfordnlp", 
-                   preprocessors = ["tokenize", "mwt", "lemma", "pos", "depparse", "stem"],
+                   preprocess_method = "stanza", 
+                   preprocessors = ["tokenize", "mwt", "lemma", "pos", "depparse", "ner", "stem"],
                    silent = False):
         """
         preprocess_method (str|fun): method used for normalization
@@ -88,10 +88,10 @@ class Texts():
         self.__preprocess_method = preprocess_method
         self.preprocessors = preprocessors
 
-        self.__preprocessed_ttd = TextToDf(lang = self.language, 
+        self.__preprocessed_ttt = TextToTokens(lang = self.language, 
                        method = self.__preprocess_method, 
                        args = preprocessors)
-        self.__preprocessed_texts = self.__preprocessed_ttd.texts_to_dfs(texts = self.raw_texts, silent=silent)
+        self.__preprocessed_texts = self.__preprocessed_ttt.texts_to_tokens(texts = self.raw_texts, silent=silent)
         self.is_preprocessed = True
 
     def get_preprocessed_texts(self):
@@ -112,7 +112,7 @@ class Texts():
         """
         self.__check_preprocessed("score_sentiment()", ["tokenize","lemma"])
         tts = TextToSentiment(lang=self.language, method=method, type_token=type_token)
-        self.__sentiment_scores = tts.texts_to_sentiment(self.__preprocessed_ttd)
+        self.__sentiment_scores = tts.texts_to_sentiment(self.__preprocessed_ttt)
 
     def get_sentiments(self):
         if self.__sentiment_scores is None:
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     texts = [t1, t2, t3]
 
     # Init Texts object
-    tt = Texts(texts, languages = "da")
+    tt = TextTo(texts, languages = "da")
     tt.preprocess(silent = True)
     dfs = tt.get_preprocessed_texts()
     # Score sentiment

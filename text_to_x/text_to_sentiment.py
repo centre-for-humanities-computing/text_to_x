@@ -5,7 +5,7 @@ import pandas as pd
 from text_to_x.vaderSentiment.vaderSentiment_en import SentimentIntensityAnalyzer as Sentiment_en
 from text_to_x.vaderSentiment.vaderSentiment_da import SentimentIntensityAnalyzer as Sentiment_da
 from text_to_x.utils import detect_lang_polyglot
-from text_to_x.text_to_df import TextToDf
+from text_to_x.text_to_tokens import TextToTokens
 
 class TextToSentiment():
     def __init__(self,  lang = None, method = "dictionary", type_token = None, detect_lang_fun = "polyglot"):
@@ -44,7 +44,7 @@ class TextToSentiment():
             raise TypeError(f"When 'texts' is a list, it must contain strings only.")
         if isinstance(texts, str):
             texts = [texts]
-        if isinstance(texts, TextToDf):
+        if isinstance(texts, TextToTokens):
             tokenlist = [df[self.type_token] for df in texts.dfs]
             if self.lang is None:
                 self.lang = texts.lang
@@ -108,13 +108,13 @@ if __name__ == "__main__":
     df
 
     # with TextToDf
-    ttd = TextToDf()
-    ttd.texts_to_dfs(texts)
+    ttt = TextToTokens()
+    ttt.texts_to_tokens(texts)
 
     s = Sentiment_da()
-    [s.polarity_scores(text = text, tokenlist=df['lemma']) for text, df in zip(texts, ttd.dfs)]
+    [s.polarity_scores(text = text, tokenlist=df['lemma']) for text, df in zip(texts, ttt.dfs)]
     tts = TextToSentiment(method="dictionary")
-    df = tts.texts_to_sentiment(ttd)
+    df = tts.texts_to_sentiment(ttt)
 
 
 

@@ -8,12 +8,12 @@ from nltk.stem.snowball import SnowballStemmer
 from nltk.stem.snowball import PorterStemmer
 
 from text_to_x.utils import detect_lang_polyglot, silence
-from text_to_x.methods.stanfordnlp_to_df import stanfordnlp_to_df
+from text_to_x.methods.stanza_to_df import stanza_to_df
 
 
 
-class TextToDf():
-    def __init__(self, lang = None, method = "stanfordnlp", args = ["tokenize", "mwt", "lemma", "pos", "depparse", "stem"], detect_lang_fun = "polyglot", **kwargs):
+class TextToTokens():
+    def __init__(self, lang = None, method = "stanza", args = ["tokenize", "mwt", "lemma", "pos", "depparse", "ner", "stem"], detect_lang_fun = "polyglot", **kwargs):
         """
         lang (str): language code, if None language is detected using detect_lang_fun (which defaults to polyglot).
         detect_lang_fun (str|fun): fucntion to use for language detection. default is polyglot. But you can specify a user function, which return 
@@ -21,15 +21,16 @@ class TextToDf():
         args (list): can include "tokenize", "mwt", "lemma", "pos", "depparse", "stem"
         """
         self.__detect_lang_fun_dict = {"polyglot": detect_lang_polyglot}
-        self.__method_dict = {"stanfordnlp": stanfordnlp_to_df}
+        self.__method_dict = {"stanza": stanza_to_df}
         self.lang = lang
         self.args = args
         self.dfs = None
         self.kwargs = kwargs
 
-        if 'tokenize' not in args:
+        if 'tokenize' not in args and "stem" in args:
             args.append('tokenize')
-        self.__preprocessor_args = {"processor": ",".join(self.args)}
+        
+        self.preprocessor_args = {"processors": ",".join(a for a in self.args if a in {"tokenize", "mwt", "lemma", "pos", "depparse", "ner"})}
 
         if isinstance(method, str):
             self.method = self.__method_dict[method]
@@ -41,7 +42,7 @@ class TextToDf():
         elif not callable(detect_lang_fun):
             raise TypeError(f"detect_lang_fun should be a string or callable not a {type(detect_lang_fun)}")
 
-    def texts_to_dfs(self, texts, silent = True):
+    def texts_to_tokens(self, texts, silent = True):
         """
         texts (str|list): Should be a string, a list or other iterable object
         """
@@ -56,7 +57,7 @@ class TextToDf():
             self.lang = [self.detect_lang_fun(text, **self.kwargs) for text in texts]
         
         self.texts = texts
-        self.dfs = self.method(texts, self.lang, **self.__preprocessor_args)
+        self.dfs = self.method(texts, self.lang, **self.preprocessor_args)
         if 'stem' in self.args:
             self.__stem(**self.kwargs)
         if silent:
@@ -77,8 +78,7 @@ class TextToDf():
             self.stemmer = ss.stem
         elif not callable(self.stemmer):
             raise TypeError(f"stemmer should be a 'porter' or 'snowball' or callable not a type: {type(self.stemmer)}")
-        
-        
+      
 
     def __stem(self, stemmer = "snowball", **kwargs):
         if isinstance(self.lang, str):
@@ -95,9 +95,7 @@ class TextToDf():
                 self.dfs[i]['stem'] = [self.stemmer(token) for token in self.dfs[i]['token']]
 
 
-        
-        
-    
+
 if __name__ == "__main__":
     # testing code
 
@@ -112,6 +110,5 @@ if __name__ == "__main__":
     # we will test it using a list but a single text will work as well
     texts = [t1, t2, t3]
 
-    ttd = TextToDf(lang = "da")
-    dfs = ttd.texts_to_dfs(texts)
-
+    ttt = TextToTokens(lang = "da")
+    dfs = ttt.texts_to_tokens(texts)

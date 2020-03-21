@@ -49,4 +49,3 @@ def silence(func):
         return value
 
     return func_wrapper
-

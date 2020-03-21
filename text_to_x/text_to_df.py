@@ -7,25 +7,27 @@ import numpy as np
 from nltk.stem.snowball import SnowballStemmer
 from nltk.stem.snowball import PorterStemmer
 
-from text_to_x.utils import detect_lang_polyglot, silence
+from text_to_x.utils import silence
 from text_to_x.methods.stanfordnlp_to_df import stanfordnlp_to_df
+from text_to_x.text_to import TextTo
 
 
-
-class TextToDf():
-    def __init__(self, lang = None, method = "stanfordnlp", args = ["tokenize", "mwt", "lemma", "pos", "depparse", "stem"], detect_lang_fun = "polyglot", **kwargs):
+class TextToDf(TextTo):
+    def __init__(self, lang = None, method = "stanfordnlp", 
+                 args = ["tokenize", "mwt", "lemma", "pos", "depparse", "stem"], 
+                 detect_lang_fun = "polyglot", **kwargs):
         """
-        lang (str): language code, if None language is detected using detect_lang_fun (which defaults to polyglot).
+        lang (str): language code(s), if None language is detected using detect_lang_fun (which defaults to polyglot). Can be a list of codes.
         detect_lang_fun (str|fun): fucntion to use for language detection. default is polyglot. But you can specify a user function, which return 
         method (str|fun): method used for normalization
         args (list): can include "tokenize", "mwt", "lemma", "pos", "depparse", "stem"
         """
-        self.__detect_lang_fun_dict = {"polyglot": detect_lang_polyglot}
+        super().__init__(lang = lang, kwargs = kwargs, 
+                         detect_lang_fun = detect_lang_fun)
+        
         self.__method_dict = {"stanfordnlp": stanfordnlp_to_df}
-        self.lang = lang
         self.args = args
         self.dfs = None
-        self.kwargs = kwargs
 
         if 'tokenize' not in args:
             args.append('tokenize')
@@ -36,11 +38,6 @@ class TextToDf():
         elif not callable(method):
             raise TypeError(f"method should be a str or callable not a type: {type(method)}")
 
-        if isinstance(detect_lang_fun, str):
-            self.detect_lang_fun = self.__detect_lang_fun_dict[detect_lang_fun]
-        elif not callable(detect_lang_fun):
-            raise TypeError(f"detect_lang_fun should be a string or callable not a {type(detect_lang_fun)}")
-
     def texts_to_dfs(self, texts, silent = True):
         """
         texts (str|list): Should be a string, a list or other iterable object
@@ -48,17 +45,17 @@ class TextToDf():
         if isinstance(texts, str):
             texts = [texts]
 
+        # Detect language if not specified
+        self._detect_language(texts)
+
         if silent:
             sav = self.method
             self.method = silence(self.method)
 
-        if self.lang is None:
-            self.lang = [self.detect_lang_fun(text, **self.kwargs) for text in texts]
-        
         self.texts = texts
         self.dfs = self.method(texts, self.lang, **self.__preprocessor_args)
         if 'stem' in self.args:
-            self.__stem(**self.kwargs)
+            self.__stem(**self._kwargs)
         if silent:
             self.method = sav
         return self.dfs
@@ -77,8 +74,6 @@ class TextToDf():
             self.stemmer = ss.stem
         elif not callable(self.stemmer):
             raise TypeError(f"stemmer should be a 'porter' or 'snowball' or callable not a type: {type(self.stemmer)}")
-        
-        
 
     def __stem(self, stemmer = "snowball", **kwargs):
         if isinstance(self.lang, str):
@@ -96,8 +91,6 @@ class TextToDf():
 
 
         
-        
-    
 if __name__ == "__main__":
     # testing code
 

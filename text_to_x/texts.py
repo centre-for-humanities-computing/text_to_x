@@ -7,16 +7,16 @@ import pandas as pd
 
 from text_to_x.text_to_df import TextToDf
 from text_to_x.text_to_sentiment import TextToSentiment
-from text_to_x.utils import detect_lang_polyglot
+from text_to_x.text_to import TextTo
 
-class Texts():
+class Texts(TextTo):
     def __init__(self, texts, 
-                 language = None,  
+                 lang = None,  
                  detect_lang_fun = "polyglot", 
                  **kwargs):
         """
         texts (list): texts to process.
-        language (str): language code(s), if None language is detected using detect_lang_fun (which defaults to polyglot). Can be list of codes.
+        lang (str): language code(s), if None language is detected using detect_lang_fun (which defaults to polyglot). Can be list of codes.
         detect_lang_fun (str|fun): fucntion to use for language detection. default is polyglot. But you can specify a user function, which return   
 
         Examples
@@ -25,7 +25,7 @@ class Texts():
         >>> t1 = '\\n'.join([t for t in text.split('\\n')[1:50] if t]) # take subset of data
         >>> t2 = '\\n'.join([t for t in text.split('\\n')[50:100] if t])
         >>> texts = [t1, t2]
-        >>> tt = Texts(texts, languages = "da") # make text class
+        >>> tt = Texts(texts, lang = "da") # make text class
         >>> tt.preprocess(silent = True)
         ...
         >>> dfs = tt.get_preprocessed_texts()
@@ -38,31 +38,19 @@ class Texts():
         >>> isinstance(df, pd.DataFrame)
         True
         """
+        super().__init__(lang = lang, kwargs = kwargs, 
+                         detect_lang_fun = detect_lang_fun)
 
         self.raw_texts = texts
-        self.__kwargs = kwargs
-        self.language = language
         self.__preprocess_method = None
         self.preprocessors = None
-        self.__detect_lang_fun = detect_lang_fun
         self.__sentiment_scores = None
-        
-        if self.language is None:
-            self.language = self.__detect_languages(detect_lang_fun)
-
         self.__preprocessed_texts = None
         self.is_preprocessed = False
         
-    def __detect_languages(self, detect_lang_fun):
-        if isinstance(detect_lang_fun, str):
-            detect_lang_fun_dict = {"polyglot": detect_lang_polyglot}
-            if detect_lang_fun not in detect_lang_fun_dict:
-                raise ValueError(f"{detect_lang_fun} is not a valid string for detect_lang_fun")
-            detect_lang_fun = detect_lang_fun_dict[detect_lang_fun]
-        elif not callable(detect_lang_fun):
-            raise TypeError(f"detect_lang_fun should be a string or callable not a {type(detect_lang_fun)}")
-        return [detect_lang_fun(text, **self.__kwargs) for text in self.raw_texts]
-
+        # Detect language if not specified
+        self._detect_language(self.raw_texts)
+        
     def __check_preprocessed(self, method_name, required_processes = None):
         assert required_processes is None or isinstance(required_processes, (str, list)), \
             "required_processes must be a list of strings or None."
@@ -88,16 +76,17 @@ class Texts():
         self.__preprocess_method = preprocess_method
         self.preprocessors = preprocessors
 
-        self.__preprocessed_ttd = TextToDf(lang = self.language, 
-                       method = self.__preprocess_method, 
-                       args = preprocessors)
-        self.__preprocessed_texts = self.__preprocessed_ttd.texts_to_dfs(texts = self.raw_texts, silent=silent)
+        self.__preprocessed_ttd = TextToDf(
+            lang = self.lang, 
+            method = self.__preprocess_method, 
+            args = preprocessors)
+        self.__preprocessed_texts = self.__preprocessed_ttd.texts_to_dfs(
+            texts = self.raw_texts, silent = silent)
         self.is_preprocessed = True
 
     def get_preprocessed_texts(self):
-        if self.__preprocessed_texts is None:
-            raise RuntimeError("The preprocess() method has not been called yet.")
-        return self.__preprocessed_texts
+        return self._get(self.__preprocessed_texts, 
+                         "The preprocess() method has not been called yet.")
 
     def score_sentiment(self, method = "dictionary", type_token = None):
         """
@@ -111,13 +100,12 @@ class Texts():
         Use get_sentiments() method to extract scores.
         """
         self.__check_preprocessed("score_sentiment()", ["tokenize","lemma"])
-        tts = TextToSentiment(lang=self.language, method=method, type_token=type_token)
+        tts = TextToSentiment(lang=self.lang, method=method, type_token=type_token)
         self.__sentiment_scores = tts.texts_to_sentiment(self.__preprocessed_ttd)
 
     def get_sentiments(self):
-        if self.__sentiment_scores is None:
-            raise RuntimeError("The score_sentiment() method has not been called yet.")
-        return self.__sentiment_scores
+        return self._get(self.__sentiment_scores, 
+                         "The score_sentiment() method has not been called yet.")
 
     def model_topics(self):
         # self.__check_preprocessed("model_topics()", ["tokenize","lemma"])
@@ -149,7 +137,7 @@ if __name__ == "__main__":
     texts = [t1, t2, t3]
 
     # Init Texts object
-    tt = Texts(texts, languages = "da")
+    tt = Texts(texts, lang = "da")
     tt.preprocess(silent = True)
     dfs = tt.get_preprocessed_texts()
     # Score sentiment

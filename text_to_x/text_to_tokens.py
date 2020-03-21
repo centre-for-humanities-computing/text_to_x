@@ -17,7 +17,7 @@ class TextToTokens(TextTo):
                  method = "stanza",
                  lemmatize = True,
                  stem = False,
-                 pos = False,
+                 pos = True,
                  mwt = False,
                  depparse = False,
                  casing = False,
@@ -42,9 +42,9 @@ class TextToTokens(TextTo):
             "depparse" : depparse,
             "casing" : casing
         }
-        self.__preprocessor_args = {"processor": ",".join(
-            [procss for procss, flag in self.preprocessors.items() if \
-                flag and procss not in ["stem","casing"]])}
+        self.__preprocessor_args = {"processors": ",".join(
+            procss for procss, flag in self.preprocessors.items() if \
+                flag and (procss not in {"stem","casing"}))}
         
         self.dfs = None
 
@@ -131,6 +131,6 @@ if __name__ == "__main__":
     from text_to_x.utils import get_test_data
     texts = get_test_data()
 
-    ttd = TextToTokens(lang = "da")
-    dfs = ttd.texts_to_tokens(texts)
+    ttt = TextToTokens(lang = "da")
+    dfs = ttt.texts_to_tokens(texts)
 

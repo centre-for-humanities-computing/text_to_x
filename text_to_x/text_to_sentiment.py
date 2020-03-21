@@ -4,11 +4,12 @@ import pandas as pd
 
 from text_to_x.vaderSentiment.vaderSentiment_en import SentimentIntensityAnalyzer as Sentiment_en
 from text_to_x.vaderSentiment.vaderSentiment_da import SentimentIntensityAnalyzer as Sentiment_da
-from text_to_x.utils import detect_lang_polyglot
 from text_to_x.text_to_tokens import TextToTokens
+from text_to_x.text_to import TextTo
 
-class TextToSentiment():
-    def __init__(self,  lang = None, method = "dictionary", type_token = None, detect_lang_fun = "polyglot"):
+class TextToSentiment(TextTo):
+    def __init__(self, lang = None, method = "dictionary", type_token = None, 
+                 detect_lang_fun = "polyglot", **kwargs):
         """
         lang (str): language code, if None language is detected using detect_lang_fun (which defaults to polyglot).
         detect_lang_fun (str|fun): fucntion to use for language detection. default is polyglot. But you can specify a user function, which return 
@@ -16,17 +17,12 @@ class TextToSentiment():
         type_token (None|'lemma'|'token'): The type of token used. If None is chosen to be token automatically depending on method.
         'lemma' for dictionary otherwise 'token'. Only used if a tokenlist or a TextToDf is passed to texts_to_sentiment()
         """
-        self.__detect_lang_fun_dict = {"polyglot": detect_lang_polyglot}
+        super().__init__(lang = lang, kwargs = kwargs, 
+                         detect_lang_fun = detect_lang_fun)
 
         if type_token is None:
             self.type_token = 'lemma' if method == "dictionary" else 'token'
 
-        if isinstance(detect_lang_fun, str):
-            detect_lang_fun = self.__detect_lang_fun_dict[detect_lang_fun]
-        elif not callable(detect_lang_fun):
-            raise TypeError(f"detect_lang_fun should be a string or callable not a {type(detect_lang_fun)}")
-        
-        self.lang = lang
         if method == "dictionary":
             self.method = self.__get_sent_dict
         elif callable(method):
@@ -39,16 +35,20 @@ class TextToSentiment():
         texts (str|list|TextToDf): Should be a string, a list of strings or other iterable object or an object of class TextToDf
         """
         tokenlist = None
-        if isinstance(texts, list) and not isinstance(texts[0], str):
-            # One may accidentally pass the list of preprocessed data frames
-            raise TypeError(f"When 'texts' is a list, it must contain strings only.")
-        if isinstance(texts, str):
-            texts = [texts]
+        assert isinstance(texts, (TextToTokens, str, list)), \
+            "'texts' must be str, list of strings or TextToTokens object."
         if isinstance(texts, TextToTokens):
             tokenlist = [df[self.type_token] for df in texts.dfs]
             if self.lang is None:
                 self.lang = texts.lang
             texts = texts.texts
+        else:
+            if isinstance(texts, str):
+                texts = [texts]
+            elif isinstance(texts, list) and not isinstance(texts[0], str):
+                # One may accidentally pass the list of preprocessed data frames
+                raise TypeError(f"When 'texts' is a list, it must contain strings only.")
+            self._detect_language(texts)
         return self.method(texts, tokenlist)
     
     def __get_sent_dict(self, texts, tokenlist):

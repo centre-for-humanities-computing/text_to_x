@@ -7,7 +7,7 @@ import pandas as pd
 
 from text_to_x.text_to_df import TextToDf
 from text_to_x.text_to_sentiment import TextToSentiment
-
+from text_to_x.utils import detect_lang_polyglot
 
 class Texts():
     def __init__(self, texts, 
@@ -55,13 +55,10 @@ class Texts():
         
     def __detect_languages(self, detect_lang_fun):
         if isinstance(detect_lang_fun, str):
-            if detect_lang_fun == "polyglot":
-                from text_to_x.utils import detect_lang_polyglot
-                detect_lang_fun = detect_lang_polyglot
-            else:
-                # detect_lang_fun_dict = {"polyglot": detect_lang_polyglot}
-                # detect_lang_fun = detect_lang_fun_dict[detect_lang_fun]
-                raise ValueError("'polyglot' is currently the only accepted string value of detect_lang_fun.")
+            detect_lang_fun_dict = {"polyglot": detect_lang_polyglot}
+            if detect_lang_fun not in detect_lang_fun_dict:
+                raise ValueError(f"{detect_lang_fun} is not a valid string for detect_lang_fun")
+            detect_lang_fun = detect_lang_fun_dict[detect_lang_fun]
         elif not callable(detect_lang_fun):
             raise TypeError(f"detect_lang_fun should be a string or callable not a {type(detect_lang_fun)}")
         return [detect_lang_fun(text, **self.__kwargs) for text in self.raw_texts]

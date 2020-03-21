@@ -56,14 +56,15 @@ class Texts(TextTo):
             "required_processes must be a list of strings or None."
         if not self.is_preprocessed:
             raise RuntimeError(f"{method_name} requires the preprocessing() method to be run first.")
-        if required_processes is not None and not set(required_processes).issubset(set(self.preprocessors)):
+        if required_processes is not None and not set(required_processes).issubset(
+            set(self.applied_preprocessors)):
             raise RuntimeError(f"{method_name} requires these preprocessing steps: {required_processes}")
 
     def preprocess(self, 
                    preprocess_method = "stanza",
                    lemmatize = True,
                    stem = False,
-                   pos = False,
+                   pos = True,
                    mwt = False,
                    depparse = False,
                    casing = False,
@@ -79,6 +80,16 @@ class Texts(TextTo):
             warnings.warn("Overwriting previous preprocessing.")
 
         self.__preprocess_method = preprocess_method
+        self.preprocessors = {
+            "tokenize" : True,
+            "lemma" : lemmatize,
+            "stem" : stem,
+            "mwt" : mwt, 
+            "pos" : pos, 
+            "depparse" : depparse,
+            "casing" : casing
+        }
+        self.applied_preprocessors = [procss for procss,flag in self.preprocessors.items() if flag]
         self.__preprocessed_ttt = TextToTokens(
             lang = self.lang, 
             method = self.__preprocess_method, 

@@ -43,8 +43,7 @@ class TextToToken(TextTo):
             "casing" : casing
         }
         self.__preprocessor_args = {"processor": ",".join(
-            [procss for procss, flag in self.preprocessors.items() if flag])}
-        print(self.__preprocessor_args)
+            [procss for procss, flag in self.preprocessors.items() if flag and procss not in ["stem","casing"]])}
         
         self.dfs = None
 

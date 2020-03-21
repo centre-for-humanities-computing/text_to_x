@@ -134,15 +134,8 @@ if __name__ == "__main__":
     # os.getcwd()
     # os.chdir("..")
     # make some data
-    with open("test_data/fyrtårnet.txt", "r") as f:
-        text = f.read()
-        # just some splits som that the text aren't huge
-    t1 = "\n".join([t for t in text.split("\n")[1:50] if t])
-    t2 = "\n".join([t for t in text.split("\n")[50:100] if t])
-    t3 = "\n".join([t for t in text.split("\n")[100:150] if t])
-
-    # we will test it using a list but a single text will work as well
-    texts = [t1, t2, t3]
+    from text_to_x.utils import get_test_data
+    texts = get_test_data()
 
     # Init Texts object
     tt = Texts(texts, lang = "da")

@@ -14,7 +14,7 @@ setuptools.setup(
    author_email='kennethcenevoldsen@gmail.com',
    url="https://github.com/centre-for-humanities-computing/normalize_text_to_df",
    packages=setuptools.find_packages(), 
-   install_requires=['numpy', 'pandas', 'stanfordnlp', 'polyglot'], #external packages as dependencies
+   install_requires=['numpy', 'pandas', 'stanfordnlp', 'polyglot', 'nltk'], #external packages as dependencies
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[

@@ -1,12 +1,13 @@
 """
 """
+import os
+import sys
+import contextlib
 
 import numpy as np
-from polyglot.detect import Detector
 
 ### Defining Language detection
 def detect_lang_polyglot(text, simplify = True, print_error = False, raise_error = False, keep_unreliable = False, **kwargs):
-
   """
   For detecting language using polyglot, but with exception handling
 
@@ -17,7 +18,8 @@ def detect_lang_polyglot(text, simplify = True, print_error = False, raise_error
   ('no', 97.0)
   >>> detect_lang(text = "Dette er åbenbart en norsk tekst. This is also an english text.", keep_unreliable = True)
   """
-  text = str(text)
+  from polyglot.detect import Detector
+
   try:
     detector = Detector(text, quiet=True)
     if detector.reliable or keep_unreliable:
@@ -33,3 +35,18 @@ def detect_lang_polyglot(text, simplify = True, print_error = False, raise_error
   if simplify:
     return np.nan
   return np.nan, np.nan
+
+def silence(func):
+    def func_wrapper(*args, **kwargs):
+        # block all printing to the console
+        sav = sys.stdout
+        sys.stdout = open(os.devnull, 'w')
+        # call the method in question
+        value = func(*args, **kwargs)
+        # enable all printing to the console
+        sys.stdout = sav
+        # pass the return value of the method back
+        return value
+
+    return func_wrapper
+

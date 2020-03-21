@@ -1,7 +1,10 @@
 """
 """
 import os
+from pathlib import Path
+
 import pandas as pd
+
 import stanfordnlp
 
 def dl_missing_langs_snlp(langs, stanfordnlp_path):
@@ -16,7 +19,7 @@ def dl_missing_langs_snlp(langs, stanfordnlp_path):
     if isinstance(langs, str):
         langs = [langs]
     
-    if not os.path.exists(stanfordnlp_path):
+    if stanfordnlp_path is not None and not os.path.exists(stanfordnlp_path):
         os.makedirs(stanfordnlp_path)
 
     dl_langs = [folder[:2] for folder in os.listdir(stanfordnlp_path)]
@@ -26,8 +29,6 @@ def dl_missing_langs_snlp(langs, stanfordnlp_path):
                 stanfordnlp.download(lang, resource_dir=stanfordnlp_path, force = True)
             except ValueError:
                 raise ValueError(f"Language: '{lang}' does not exist in stanford NLP. Try specifying another language")
-
-
 
 
 def stanfordnlp_to_df(texts, langs, stanfordnlp_path = None, silent = False, **kwargs):
@@ -48,7 +49,7 @@ def stanfordnlp_to_df(texts, langs, stanfordnlp_path = None, silent = False, **k
 
     # Download missing SNLP resources for the detected/specified language
     if stanfordnlp_path == None:
-        stanfordnlp_path = os.getcwd() + "/stanfordnlp_resources"
+        stanfordnlp_path = os.path.join(str(Path.home()), 'stanfordnlp_resources')
     dl_missing_langs_snlp(langs, stanfordnlp_path)
     
     if isinstance(langs, list):

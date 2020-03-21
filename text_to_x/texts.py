@@ -130,9 +130,9 @@ if __name__ == "__main__":
   doctest.testmod(verbose=True)
 
 if __name__ == "__main__":
-    # import os
-    # os.getcwd()
-    # os.chdir("..")
+    import os
+    os.getcwd()
+    os.chdir("..")
     # make some data
     from text_to_x.utils import get_test_data
     texts = get_test_data()

@@ -133,3 +133,4 @@ stanfordnlp_resources/*
 stanfordnlp_resources
 nn
 .DS_Store
+test_text_to_x.py

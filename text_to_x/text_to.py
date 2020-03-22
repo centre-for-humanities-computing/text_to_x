@@ -6,6 +6,8 @@ class TextTo():
         """
         Super class for the text_to transformer classes.
         Provides language detection with more.
+
+        If language should not be detected, set 'lang = -1'.
         """
         self.lang = lang
         self._kwargs = kwargs

@@ -10,7 +10,7 @@ from text_to_x.text_to import TextTo
 
 
 class TextToVocab(TextTo):
-    def __init__(self, type_token = None, **kwargs):
+    def __init__(self, type_token = "token", **kwargs):
         """
         Extract vocabulary and term counter for each text.
 
@@ -26,10 +26,11 @@ class TextToVocab(TextTo):
         self.__counters = None
         self.__vocabs = None
         
-    def texts_to_vocabs(self, preprocessed_texts, lower = False): # TODO change arg name?
+    def texts_to_vocabs(self, preprocessed_texts, lower = False, top_n = None): # TODO change first arg name?
         """
         preprocessed_texts (list of data frames | TextToTokens): Data frames with tokens.
         lower (bool): Whether to lowercase the tokens first.
+        top_n (int | None): Keep only the top n most frequent tokens.
         
         Returns 1) list of collections.Counter objects and 2) lists of unique tokens
         """
@@ -46,7 +47,9 @@ class TextToVocab(TextTo):
             return tokens
 
         self.__counters = [Counter(lower_tokens(df[self.type_token])) for df in preprocessed_texts]
-        self.__vocabs = [sorted(list(counter.keys())) for counter in self.__counters]
+        if top_n is not None:
+            self.__counters = [Counter(dict(c.most_common(top_n))) for c in self.__counters]
+        self.__vocabs = [sorted(list(c.keys())) for c in self.__counters]
         return self.__counters, self.__vocabs
 
     def get_counters(self):

@@ -9,6 +9,7 @@ from text_to_x.text_to_tokens import TextToTokens
 from text_to_x.text_to_sentiment import TextToSentiment
 from text_to_x.text_to_vocab import TextToVocab
 from text_to_x.text_to import TextTo
+from text_to_x.concordance import extract_concordance
 
 class Texts(TextTo):
     def __init__(self, texts, 
@@ -50,6 +51,7 @@ class Texts(TextTo):
         self.is_preprocessed = False
         self.__token_counters = None
         self.__vocabs = None
+        self.__concordances = None
         
         # Detect language if not specified
         self._detect_language(self.raw_texts)
@@ -62,6 +64,8 @@ class Texts(TextTo):
         if required_processes is not None and not set(required_processes).issubset(
             set(self.applied_preprocessors)):
             raise RuntimeError(f"{method_name} requires these preprocessing steps: {required_processes}")
+
+    # Preprocessing
 
     def preprocess(self, 
                    preprocess_method = "stanza",
@@ -110,13 +114,16 @@ class Texts(TextTo):
         return self._get(self.__preprocessed_texts, 
                          "The preprocess() method has not been called yet.")
 
-    def extract_vocabulary(self, type_token = "token", lower = False):
+    # Vocabulary
+
+    def extract_vocabulary(self, type_token = "token", lower = False, top_n = None):
         """
         Creates a token counter (term frequency) and a vocabulary for each text.
         Get result with get_vocabularies() or get_token_counters().
 
         type_token (str): Either 'token', 'lemma', or 'stem'.
         lower (bool): Whether to lowercase the tokens first.
+        top_n (int | None): Keep only the top n most frequent tokens.
         """
         if type_token == "token":
             required_process = "tokenize"
@@ -125,7 +132,7 @@ class Texts(TextTo):
         self.__check_preprocessed("extract_vocabulary()", [required_process])
         ttv = TextToVocab(type_token = type_token)
         self.__token_counters, self.__vocabs = ttv.texts_to_vocabs(
-            self.__preprocessed_texts, lower = lower)
+            self.__preprocessed_texts, lower = lower, top_n = top_n)
 
     def get_vocabularies(self):
         return self._get(self.__vocabs, 
@@ -134,6 +141,26 @@ class Texts(TextTo):
     def get_token_counters(self):
         return self._get(self.__token_counters, 
                          "The extract_vocabulary() method has not been called yet.")
+
+    # Concordance
+
+    def extract_concordance(self, tokens, type_token = "token", lower = True):
+        """
+        For a set of tokens, extract the sentences they occur in.
+
+        tokens (list of str): List of tokens to find concordances for.
+        type_token (str): Either 'token', 'lemma', or 'stem'.
+        lower (bool): Whether to lowercase the tokens first.
+        """
+        self.__concordances = extract_concordance(
+            self.__preprocessed_texts, tokens = tokens, 
+            type_token = type_token, lower = lower)
+    
+    def get_concordances(self):
+        return self._get(self.__concordances, 
+                         "The extract_concordance() method has not been called yet.")
+
+    # Sentiment
 
     def score_sentiment(self, method = "dictionary", type_token = None):
         """
@@ -153,6 +180,8 @@ class Texts(TextTo):
     def get_sentiments(self):
         return self._get(self.__sentiment_scores, 
                          "The score_sentiment() method has not been called yet.")
+
+    # Topic modeling
 
     def model_topics(self):
         # self.__check_preprocessed("model_topics()", ["tokenize","lemma"])
@@ -181,9 +210,13 @@ if __name__ == "__main__":
     tt.preprocess(silent = True)
     dfs = tt.get_preprocessed_texts()
     # Extract vocabulary and token counter (term frequency)
-    tt.extract_vocabulary()
+    tt.extract_vocabulary(top_n = 20, lower = True)
     tf = tt.get_token_counters()
     vcb = tt.get_vocabularies()
+    # Extract concordance (sentences the token occur in)
+    tt.extract_concordance(tokens = ["kammer", "skilling", "soldaterne"], 
+                           type_token = "token", lower = True)
+    cc = tt.get_concordances()
     # Score sentiment
     tt.score_sentiment()
     df = tt.get_sentiments()

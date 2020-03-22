@@ -169,7 +169,8 @@ class Texts(TextTo):
         if isinstance(self.lang, str):
             self.__descriptors = all_metrics(self.raw_texts, lang = self.lang)
         elif isinstance(self.lang, list):
-            # TODO Change once Lasse has enabled a list of languages
+            # TODO Change if Lasse enables a list of languages
+            # TODO Otherwise, call for each collection of languages and restore order afterwards
             self.__descriptors = pd.concat([all_metrics(t, lang = l) \
                 for t,l in zip(self.raw_texts, self.lang)])
 
@@ -190,8 +191,8 @@ class Texts(TextTo):
 
         Use get_sentiments() method to extract scores.
         """
-        self.__check_preprocessed("score_sentiment()", ["tokenize","lemma"])
-        tts = TextToSentiment(lang=self.lang, method=method, type_token=type_token)
+        self.__check_preprocessed("score_sentiment()", ["tokenize", "lemma"])
+        tts = TextToSentiment(lang = self.lang, method = method, type_token = type_token)
         self.__sentiment_scores = tts.texts_to_sentiment(self.__preprocessed_ttt)
 
     def get_sentiments(self):

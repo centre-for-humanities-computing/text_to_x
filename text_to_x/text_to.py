@@ -13,6 +13,7 @@ class TextTo():
         self._kwargs = kwargs
         self._detect_lang_fun = detect_lang_fun
         self.__prepare_language_detector()
+
         
     # Private methods
 
@@ -39,9 +40,20 @@ class TextTo():
             raise err(msg)
         return x
 
-    def _detect_language(self, texts):
+    def _detect_language(self, texts, simplify = True):
         """
         Detect the language of each text.
+        simplify (bool): When all texts have the same language, whether to set to scalar string with that code.
         """
         if self.lang is None:
             self.lang = [self._detect_lang_fun(text, **self._kwargs) for text in texts]
+        if simplify:
+            self._simplify_lang()
+
+    def _simplify_lang(self):
+        """
+        If self.lang is a list with exactly ONE unique language code,
+        set to be that code.
+        """
+        if isinstance(self.lang, list) and len(set(self.lang)) == 1:
+            self.lang = self.lang[0]

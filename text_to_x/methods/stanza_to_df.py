@@ -25,8 +25,7 @@ def dl_missing_langs(langs, stanza_path):
     for lang in langs:
         if lang not in dl_langs:
             try:
-
-                stanza.download(lang, dir=stanza_path)
+                stanza.download(lang, dir = stanza_path)
             except ValueError:
                 raise ValueError(f"Language: '{lang}' does not exist in stanza. Try specifying another language")
 

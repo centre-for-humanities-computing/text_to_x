@@ -131,6 +131,8 @@ dmypy.json
 
 stanfordnlp_resources/*
 stanfordnlp_resources
+snlp_resources/*
+snlp_resources
 nn
 .DS_Store
 test_text_to_x.py

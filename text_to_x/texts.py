@@ -52,6 +52,7 @@ class Texts(TextTo):
         self.__token_counters = None
         self.__vocabs = None
         self.__concordances = None
+        self.__descriptors = None
         
         # Detect language if not specified
         self._detect_language(self.raw_texts)
@@ -161,6 +162,22 @@ class Texts(TextTo):
         return self._get(self.__concordances, 
                          "The extract_concordance() method has not been called yet.")
 
+    # Text Descriptors
+
+    def calculate_descriptive_stats(self):
+        from textdescriptives import all_metrics
+        if isinstance(self.lang, str):
+            self.__descriptors = all_metrics(self.raw_texts, lang = self.lang)
+        elif isinstance(self.lang, list):
+            # TODO Change if Lasse enables a list of languages
+            # TODO Otherwise, call for each collection of languages and restore order afterwards
+            self.__descriptors = pd.concat([all_metrics(t, lang = l) \
+                for t,l in zip(self.raw_texts, self.lang)])
+
+    def get_descriptive_stats(self):
+        return self._get(self.__descriptors, 
+                         "The calculate_descriptive_stats() method has not been called yet.")
+
     # Sentiment
 
     def score_sentiment(self, method = "dictionary", type_token = None):
@@ -174,8 +191,8 @@ class Texts(TextTo):
 
         Use get_sentiments() method to extract scores.
         """
-        self.__check_preprocessed("score_sentiment()", ["tokenize","lemma"])
-        tts = TextToSentiment(lang=self.lang, method=method, type_token=type_token)
+        self.__check_preprocessed("score_sentiment()", ["tokenize", "lemma"])
+        tts = TextToSentiment(lang = self.lang, method = method, type_token = type_token)
         self.__sentiment_scores = tts.texts_to_sentiment(self.__preprocessed_ttt)
 
     def get_sentiments(self):
@@ -218,6 +235,9 @@ if __name__ == "__main__":
     tt.extract_concordance(tokens = ["kammer", "skilling", "soldaterne"], 
                            type_token = "token", lower = True)
     cc = tt.get_concordances()
+    # Calculate descriptive stats
+    tt.calculate_descriptive_stats()
+    ds = tt.get_descriptive_stats()
     # Score sentiment
     tt.score_sentiment()
     df = tt.get_sentiments()

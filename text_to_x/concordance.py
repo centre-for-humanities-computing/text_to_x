@@ -1,6 +1,5 @@
 
 import pandas as pd
-import numpy as np
 
 from text_to_x.text_to_tokens import TextToTokens
 
@@ -13,7 +12,8 @@ def extract_concordance(preprocessed_texts, tokens, type_token = "token",
     tokens (list of str): List of tokens to find concordances for.
     type_token (str): Either 'token', 'lemma', or 'stem'.
     sentence_id (str): Name of column with sentence identifier.
-    lower (bool): Whether to lowercase the tokens first.
+    lower (bool): Whether to match the tokens in lowercase.
+      Returned sentences will have original case.
     """
     if isinstance(preprocessed_texts, TextToTokens):
         preprocessed_texts = preprocessed_texts.get_token_dfs()

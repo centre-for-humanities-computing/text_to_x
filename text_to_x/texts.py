@@ -150,7 +150,8 @@ class Texts(TextTo):
 
         tokens (list of str): List of tokens to find concordances for.
         type_token (str): Either 'token', 'lemma', or 'stem'.
-        lower (bool): Whether to lowercase the tokens first.
+        lower (bool): Whether to match the tokens in lowercase. 
+          Returned sentences will have original case.
         """
         self.__concordances = extract_concordance(
             self.__preprocessed_texts, tokens = tokens, 

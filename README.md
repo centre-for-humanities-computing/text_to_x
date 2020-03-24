@@ -13,8 +13,8 @@ pip3 install --force-reinstall --no-deps  git+https://github.com/centre-for-huma
 ```
 
 ---
-## 📖 Normaliziation
-Normalization utilized stanfordNLP for tokenization, lemmatization, pos-tagging, dependency parsing.
+## 📖 Tokenization and tagging
+Normalization utilizes stanfordNLP for tokenization, lemmatization, pos-tagging, dependency parsing and Named entity recogntion (NER).
 
 
 ### Example of use

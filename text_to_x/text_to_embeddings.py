@@ -265,8 +265,6 @@ class SvdEmbeddings():
         
         # cosine similarity
         cos_sim_matrix = np.dot(self.model, vec)/(np.linalg.norm(self.model)*np.linalg.norm(vec))
-        
-        list_similar = []
 
         list_similar = [(float(cos_sim_matrix[i]), self.ind2tok[i]) for i in 
                 np.argpartition(-1 * cos_sim_matrix, n_similar + 1)[:n_similar + 1] 

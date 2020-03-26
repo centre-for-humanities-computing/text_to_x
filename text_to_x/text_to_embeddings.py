@@ -1,32 +1,81 @@
+"""
+"""
 from collections import Counter
 
 import numpy as np
 import pandas as pd
 from scipy import sparse
 from scipy.sparse import linalg 
-
 import umap
-    
+
     
 class SvdEmbeddings():
     '''
     train and operate with PMI-SVD embeddings
     
-    Examples:
-    - training with a manually set class instance
-        your_instance = SvdEmbeddings(texts)
-        your_instance.train(front_window = int, back_window = int, embedding_dim = int)
+    Usage:
+    Run preprocessing,
+    >>> from text_to_x.text_to_tokens import TextToTokens
+    >>> from text_to_x.utils import get_test_data
+    >>> raw_text = get_test_data()
+    >>> ttt = TextToTokens()
+    >>> sample_text = ttt.texts_to_tokens(raw_text)
     
-    - training with default settings:
-        your_instance = svd2vec_run_default(texts)
-        
-    - visualizing the fit
+    (option 1) then use one of the convenience functions, 
+    >>> SvdModel1 = svd2vec_run_default(sample_text)
+    >>> SvdModel2 = svd2vec_small_dataset(sample_text)
+    
+    (option 2) or make a class instance
+    >>> SvdInst = SvdEmbeddings(sample_text)
+    >>> SvdInst.train(front_window = 2, back_window = 2, embedding_dim = 50)
+    
+    Model is a numpy array, where rows are words and columns embedding dimensions 
+    >>> isinstance(SvdInst.model, np.ndarray)
+    True
+    
+    In this model, we have 460 words over 50 dimnesions
+    >>> SvdInst.model.shape
+    (460, 50)
+    
+    Words present in the model
+    >>> isinstance(SvdInst.unigram_counts, pd.DataFrame)
+    True
+    
+    Find vector representation 
+    >>> SvdInst.find('soldat')
+    array([ 0.05489066, -0.06184785,  0.02155402,  0.07336988,  0.15562366,
+           -0.05586125, -0.25812332,  0.02042852,  0.05166734,  0.03197265,
+            0.09791423, -0.11929871, -0.0229645 , -0.06041331, -0.04729205,
+           -0.06330125, -0.05803931, -0.03184649, -0.1423933 ,  0.09108703,
+            0.16427856, -0.05856962,  0.12271073, -0.13391868, -0.12081928,
+           -0.00627897, -0.07468613, -0.04102333,  0.17715846,  0.03979193,
+            0.00880396, -0.09238536,  0.10664236, -0.00629155,  0.22754591,
+           -0.2665231 , -0.09757153,  0.09906008, -0.00108509, -0.06677161,
+           -0.01872435,  0.05611655, -0.09478669,  0.04123027, -0.05015442,
+           -0.15494153, -0.11920451, -0.11169791,  0.00589421, -0.16254055])
+    
+    How similar are 'soldat' and 'hund'
+    >>> SvdInst.similarity('soldat', 'hund')
+    -0.03461061459147635
+    
+    Find most similar words to 'soldat'
+    >>> SvdInst.similar_to_query('hund')
+    [(0.030169664949560287, 'komme'), (0.02888018261193621, 'der'), (0.026827027447386905, 'igen'), (0.02651235798431899, 'sidde'), (0.026125431437429042, 'danse')]
+    
+    Find most similar words to 'hund' minus 'soldat'
+    >>> SvdInst.similar_to_vec(SvdInst.find('hund') - SvdInst.find('soldat'))
+    [(0.04576068129552308, 'hund'), (0.024899982533863614, 'der'), (0.024181414732223933, 'tre'), (0.02334725064323222, 'to'), (0.021627587366789172, 'komme'), (0.020995251865100963, 'øje')]
+    
+    Reduce semantic space dimensions to two components
+    >>> SvdInst.reduce_dim_umap()
+    >>> SvdInst.modelumap.shape
+    (460, 2)
     '''
     
     def __init__(self, texts, texts_colname = 'lemma'):
         '''
-        texts (iterable | TextToToken): input list of dataframes acquired from text_to_x.text_to_token. The "lemma" column is used. 
-        texts_colname (string): column from TextToToken DataFrame to process ("lemma" / "stem" / "word")
+        texts (iterable | TextToToken): input list of dataframes acquired from text_to_x.text_to_token. The "lemma" column is used by default. 
+        texts_colname (str): column from TextToToken DataFrame to process ("lemma" / "stem" / "word")
         '''
 
         self.model = {}
@@ -35,25 +84,30 @@ class SvdEmbeddings():
         self.unigram_counts = {}
         
         # check if input is TextToToken or simialr
-        if not isinstance(texts[0], pd.DataFrame):
-            raise ValueError("Input texts are not in a DataFrame or a list of DataFrames, please use TextToToken for preprocessing")
+        if isinstance(texts, list):
+            if not isinstance(texts[0], pd.DataFrame):
+                raise ValueError(
+                    "Input texts are not in a DataFrame or a list of DataFrames, please use TextToToken for preprocessing"
+                )
         
-        # unpack lemmas 
-        lemmas_to_list = []
-        for doc in texts:
-            doc_to_list = doc.loc[:, texts_colname].tolist()
-            lemmas_to_list.append(doc_to_list)
+            # unpack lemmas 
+            lemmas_to_list = [doc.loc[:, texts_colname].tolist() for doc in texts]
+            
+        # in case input is only one doc
+        if isinstance(texts, pd.DataFrame):
+            lemmas_to_list = texts.loc[:, texts_colname].tolist()
 
         self.texts = lemmas_to_list
       
     
-    def train(self, back_window, front_window, embedding_dim):
+    def train(self, back_window, front_window, embedding_dim, alpha = 0.75):
         '''
         train svd embeddings from texts
         
         - back_window (int): max number of words to look behind in a skipgram 
         - front_window (int):, max number of words to look forward in a skipgram 
         - embedding_dim (int): number of dimensions to fit the embeddings to
+        - alpha (float in [0,1]): context distribution smoothing factor. Coocurrance counts will be raised to the power of alpha. alpha = 1 means no smoothing. The lowering the number decreases the PMI of a word appearing in rare contexts. See Levy, Goldberg & Dagan (2015) for details.
         '''
         
         ### UNIGRAMS
@@ -103,7 +157,6 @@ class SvdEmbeddings():
         sppmi_dat_values = []
 
         # smoothing factor
-        alpha = 0.75
         nca_denom = np.sum(np.array(wwcnt_mat.sum(axis=0)).flatten()**alpha)
         sum_over_words = np.array(wwcnt_mat.sum(axis=0)).flatten()
         sum_over_words_alpha = sum_over_words**alpha
@@ -163,11 +216,6 @@ class SvdEmbeddings():
         calcualte the dot product between two given embeddings. Order doesn't matter.
         - word1: str, first word to query
         - wrod2: str, second word to query
-        
-        Example: 
-        In: self.similarity('hpv', 'vaccine')
-        
-        Out: 0.11681473580251966
         '''
         
         if not all(isinstance(i, str) for i in [word1, word2]):
@@ -188,11 +236,6 @@ class SvdEmbeddings():
     def find(self, query):
         '''
         input word, get vector representation
-        
-        Example:
-        In: self.find('hpv')
-        
-        Out: array([ 0.00435369, ...,  0.332069  ])
         '''
         if query in self.tok2ind:
             query_index = self.tok2ind[query]
@@ -209,15 +252,6 @@ class SvdEmbeddings():
         
         - query: str, word to query
         - n_similar: int, number of most simialr words to output
-        
-        Example:
-        In: self.similar_to_query('hpv')
-        
-        Out: [(0.3425330655678359, 'type'),
-             (0.29492709699932357, 'eksempel'),
-             (0.2840084462156332, 'larynxcance'),
-             (0.2736081170128576, 'sygdom'),
-             (0.24797964395624894, 'forårsag')]
         '''
         
         if not isinstance(query, str):
@@ -234,12 +268,9 @@ class SvdEmbeddings():
         
         list_similar = []
 
-        for i in np.argpartition(-1 * cos_sim_matrix, n_similar + 1)[:n_similar + 1]:
-
-            if self.ind2tok[i] == query:
-                continue
-
-            list_similar.append((float(cos_sim_matrix[i]), self.ind2tok[i]))
+        list_similar = [(float(cos_sim_matrix[i]), self.ind2tok[i]) for i in 
+                np.argpartition(-1 * cos_sim_matrix, n_similar + 1)[:n_similar + 1] 
+                if self.ind2tok[i] != query]
 
         return sorted(list_similar, reverse=True)
     
@@ -251,26 +282,13 @@ class SvdEmbeddings():
         
         - vec: np.array, input vector (also a result of operation with vectors)
         - n_similar: int, number of most simialr words to output
-        
-        Example:
-        In: self.similar_to_vec(vec = self.find('hpv') - self.find('pige'))
-        
-        Out: [(1.1030897070723877, 'hpv'),
-             (0.3426745031741564, 'type'),
-             (0.2964467662004768, 'eksempel'),
-             (0.2854145615758435, 'vort'),
-             (0.285052615742971, 'larynxcance'),
-             (0.27461291543657906, 'sygdom')]
         '''
         
         # cosine similarity
         cos_sim_matrix = np.dot(self.model, vec)/(np.linalg.norm(self.model)*np.linalg.norm(vec))
         
-        list_similar = []
-
-        for i in np.argpartition(-1 * cos_sim_matrix, n_similar + 1)[:n_similar + 1]:
-
-            list_similar.append((float(cos_sim_matrix[i]), self.ind2tok[i]))
+        list_similar = [(float(cos_sim_matrix[i]), self.ind2tok[i]) for i in
+                np.argpartition(-1 * cos_sim_matrix, n_similar + 1)[:n_similar + 1]]
 
         return sorted(list_similar, reverse=True)
     
@@ -294,7 +312,7 @@ class SvdEmbeddings():
             #correlational metric
             metric = 'cosine')
         
-        self.model2d = reduced.fit_transform(self.model)  
+        self.modelumap = reduced.fit_transform(self.model)  
     
     
 def svd2vec_small_dataset(texts):
@@ -306,3 +324,8 @@ def svd2vec_run_default(texts):
     svd = SvdEmbeddings(texts = texts)
     svd.train(back_window=5, front_window=5, embedding_dim=300)
     return svd 
+
+if __name__ == "__main__":
+    # run tests
+    import doctest
+    doctest.testmod(verbose=True)

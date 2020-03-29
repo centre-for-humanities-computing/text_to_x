@@ -9,7 +9,7 @@ import numpy as np
 def detect_lang_polyglot(text,
                          simplify=True,
                          print_error=False,
-                         raise_error=False,
+                         raise_error=True,
                          keep_unreliable=False, **kwargs):
     """
     For detecting language using polyglot, but with exception handling
@@ -24,7 +24,6 @@ def detect_lang_polyglot(text,
       This is also an english text.", keep_unreliable = True)
     """
     from polyglot.detect import Detector
-
     try:
         detector = Detector(text, quiet=True)
         if detector.reliable or keep_unreliable:
@@ -43,6 +42,17 @@ def detect_lang_polyglot(text,
 
 
 def silence(func):
+    """
+    func (fun): function which you desire silences
+
+    Examples
+    >>> def addn(x,n):  # function with annoying print
+    ...    print(f"adding {n} to {x}")
+    ...    return x + n
+    >>> add_silences = silence(addn)
+    >>> add_silences(3, 1)
+    4
+    """
     def func_wrapper(*args, **kwargs):
         # block all printing to the console
         sav = sys.stdout
@@ -51,10 +61,37 @@ def silence(func):
         value = func(*args, **kwargs)
         # enable all printing to the console
         sys.stdout = sav
-        # pass the return value of the method back
         return value
-
     return func_wrapper
+
+
+def add_def_args(func, def_args):
+    """
+    func (fun): function which to add defaults arguments to
+    def_args (dict): default argument given as a dictionary
+
+    Examples
+    >>> def addn(x,n):
+    ...    return x + n
+    >>> add3 = add_def_args(addn, {'n':3})
+    >>> add3(2)
+    5
+    """
+    def func_wrapper(*args, **kwargs):
+        value = func(*args, **def_args, **kwargs)
+        return value
+    return func_wrapper
+
+
+def add_module_to_path(module="text_to_x"):
+    # path to file
+    p = os.path.dirname(os.path.abspath(__file__))
+    # the highest level in path which corresponds to module
+    path_n = max([i for i, d in enumerate(p.split("/")) if d == module])
+    # recreate path
+    path = "/".join(p.split("/")[:path_n])
+    # add to module to path
+    sys.path.append(path)
 
 
 def get_test_data():
@@ -69,3 +106,14 @@ def get_test_data():
     # we will test it using a list but a single text will work as well
     texts = [t1, t2, t3]
     return texts
+
+
+# Example of typecheck
+# import typecheck as tc
+# @tc.typecheck
+# def foo(x: str) -> str:
+#     return x.split()
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod(verbose=True)

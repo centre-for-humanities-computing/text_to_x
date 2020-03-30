@@ -17,6 +17,7 @@ pip3 install --force-reinstall --no-deps  git+https://github.com/centre-for-huma
 Tokenization and token tagging utilized stanza, flair and keras for tokenization, lemmatization, pos-tagging, dependency parsing and NER-tagging.
 
 
+
 ### Example of use
 Let's start of by loading some data, we will use the Danish "fyrtårnet" by HC. Andersen and use 3 shorts
 splits of 50 sentences. For the full text set `short_splits=False`. It is also possible to set `data='origin_of_species'`.
@@ -110,7 +111,8 @@ df = tts.texts_to_sentiment(ttt)
 ---
 ## 🚧 Future improvements
 In estimated order
-- [ ] Make a class TextToTopic for topic modelling using gensim mallet
+- [ ] Make a class TextToTopic for topic modelling using gensim mallet and LDA
+- [ ] add fast a fast tokenizer for TextToTokens
 - [x] Add entity tagger
     - [x] add entity tagger for Danish
 - [x] Update TextToDf to use Stanza instead of stanfordnlp

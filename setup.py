@@ -4,17 +4,26 @@ with open("README.md", 'r') as f:
     long_description = f.read()
 
 setuptools.setup(
-   name='text_to_x',
-   version='1.0',
-   description='A pipeline for NLP tasks including normalization, sentiment analysis and topic modelling',
-   license='MIT',
-   long_description=long_description,
-   long_description_content_type="text/markdown",
-   author='Kenneth C. Enevoldsen',
-   author_email='kennethcenevoldsen@gmail.com',
-   url="https://github.com/centre-for-humanities-computing/normalize_text_to_df",
-   packages=setuptools.find_packages(), 
-   install_requires=['numpy', 'pandas', 'stanfordnlp', 'polyglot', 'nltk'], #external packages as dependencies
+    name='text_to_x',
+    version='1.0',
+    description='A quick pipeline for NLP tasks including normalization, sentiment \
+        analysis and topic modelling among other things',
+    license='MIT',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    author='Kenneth C. Enevoldsen',
+    author_email='kennethcenevoldsen@gmail.com',
+    url="https://github.com/centre-for-humanities-computing/\
+         normalize_text_to_df",
+    packages=setuptools.find_packages(),
+    # external packages as dependencies
+    install_requires=['numpy', 'pandas',
+                      'stanza',
+                      'polyglot',  # for language detection
+                      'nltk',  # for stemming
+                      'tensorflow',  # for keras text to sequence
+                      'gensim', 'pyLDAvis',  # for topic modelling
+                      'transformers==2.4.1', 'flair'],  # for flair
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
@@ -33,6 +42,5 @@ setuptools.setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
-
     keywords='Natural Language Processing',
 )

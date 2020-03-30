@@ -17,6 +17,10 @@ class TextToX():
         self._detect_lang_fun = detect_lang_fun
         self.__prepare_language_detector()
 
+    def get_lang(self):
+        return self.lang
+
+
     # Private methods
     def __prepare_language_detector(self):
         if self.lang == -1:

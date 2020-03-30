@@ -22,12 +22,12 @@ Tokenization and token tagging utilized stanza, flair and keras for tokenization
 Let's start of by loading some data, we will use the Danish "fyrtårnet" by HC. Andersen and use 3 shorts
 splits of 50 sentences. For the full text set `short_splits=False`. It is also possible to set `data='origin_of_species'`.
 ```{python}
-texts = get_test_data(data="fyrtårnet", short_splits=True)
+import text_to_x as ttx
+texts = ttx.get_test_data(data="fyrtårnet", short_splits=True)
 ```
 
 And the use is very simple:
 ```{python}
-import text_to_x as ttx
 ttt = ttx.TextToTokens()
 dfs = ttt.texts_to_tokens(texts)
 ```

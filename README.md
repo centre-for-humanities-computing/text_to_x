@@ -13,28 +13,21 @@ pip3 install --force-reinstall --no-deps  git+https://github.com/centre-for-huma
 ```
 
 ---
-## 📖 Normaliziation
-Normalization utilized stanfordNLP for tokenization, lemmatization, pos-tagging, dependency parsing.
+## 📖 Tokenization and token tagging
+Tokenization and token tagging utilized stanza, flair and keras for tokenization, lemmatization, pos-tagging, dependency parsing and NER-tagging.
 
 
 ### Example of use
-Let's start of by loading some data, we will use the Danish "fyrtårnet" by HC. Andersen
+Let's start of by loading some data, we will use the Danish "fyrtårnet" by HC. Andersen and use 3 shorts
+splits of 50 sentences. For the full text set `short_splits=False`. It is also possible to set `data='origin_of_species'`.
 ```{python}
-with open("test_data/fyrtårnet.txt", "r") as f:
-    text = f.read()
-# No need to run the full text let's just split the text up
-t1 = "\n".join([t for t in text.split("\n")[1:50] if t])
-t2 = "\n".join([t for t in text.split("\n")[50:100] if t])
-t3 = "\n".join([t for t in text.split("\n")[100:150] if t])
-
-# we will test it using a list but a single text will work as well
-texts = [t1, t2, t3]
+texts = get_test_data(data="fyrtårnet", short_splits=True)
 ```
 
 And the use is very simple:
 ```{python}
 import text_to_x as ttx
-ttt = TextToTokens()
+ttt = ttx.TextToTokens()
 dfs = ttt.texts_to_tokens(texts)
 ```
 ```
@@ -49,7 +42,7 @@ Currently at text: 2
 Currently at text: 3
 ```
 
-Examining the output we see
+Examining the output we see that dfs have a length equal to the number of strings in `texts` and that the output is a pandas dataframe.
 ``` {python}
 len(dfs)
 ```
@@ -71,20 +64,26 @@ n_sent        token        lemma  upos xpos dependency relation
 
 In the more extended use cases the you can modify the arguments more e.g.:
 ```
-ttt = TextToTokens(lang = ["da", "da", "da"], method = "stanza", 
-                args = {"processors":"tokenize,mwt,lemma,pos,depparse"})
+ttt = ttx.TextToTokens(lang = ["da", "da", "da"],
+                                tokenize="stanza",
+                                lemmatize="stanza",
+                                stemming=None,
+                                pos="stanza",
+                                mwt="stanza",
+                                depparse="stanza",
+                                ner="stanza")
 dfs = ttt.texts_to_tokens(texts = texts)
 ```
 Note that language can also be a list of languages and if left out the language is detected using polyglot.
 
 ---
 ## 🥳🤬 Sentiment Analysis 
-Text to X utilized an altered version of a dictionary or a multilingual BERT (not yet implented). For the dictionary approach it used an altered version of [vaderSentiment](https://github.com/cjhutto/vaderSentiment) allowing for multiple languages and use of tokenization og lemmatization derived from TextToDf.
+Text to X utilized an altered version of a dictionary or a multilingual BERT. For the dictionary approach it used an altered version of [vaderSentiment](https://github.com/cjhutto/vaderSentiment) allowing for multiple languages and use of tokens, lemmas or stems derived from TextToTokens.
 
 ### Example of use
 The simple use case is (using the same texts as above):
 ```
-tts = TextToSentiment(lang = "da", method="dictionary")
+tts = ttx.TextToSentiment(lang = "da", method="dictionary")
 df = tts.texts_to_sentiment(texts)
 print(df)
 ```
@@ -95,10 +94,10 @@ neg    neu    pos  compound
 2  0.031  0.780  0.189    0.9615
 ```
 
-If we want to use it with TextToDf we can do as follow:
+If we want to use it with TextToTokens we can do as follow:
 ```
 # create the TextToTokens
-ttt = TextToTokens()
+ttt = ttx.TextToTokens()
 ttt.texts_to_tokens(texts)
 
 # initialize the TextToSentiment
@@ -113,7 +112,7 @@ df = tts.texts_to_sentiment(ttt)
 In estimated order
 - [ ] Make a class TextToTopic for topic modelling using gensim mallet
 - [x] Add entity tagger
-    - [ ] add entity tagger for Danish
+    - [x] add entity tagger for Danish
 - [x] Update TextToDf to use Stanza instead of stanfordnlp
 - [ ] Additions to the TextToSentiment class
     - [ ] add token_to_sentiment, which give the sentiment of each token

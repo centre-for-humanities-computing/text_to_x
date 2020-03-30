@@ -94,7 +94,7 @@ def add_module_to_path(module="text_to_x"):
     sys.path.append(path)
 
 
- p = os.path.dirname(os.path.abspath(__file__))
+p = os.path.dirname(os.path.abspath(__file__))
 path_n = max([i for i, d in enumerate(p.split("/")) if d == "text_to_x"])
 path = "/".join(p.split("/")[:path_n+1])
 read_path = path + "/test_data/fyrtårnet.txt"

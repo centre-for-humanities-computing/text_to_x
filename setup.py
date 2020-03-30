@@ -16,6 +16,8 @@ setuptools.setup(
     url="https://github.com/centre-for-humanities-computing/\
          normalize_text_to_df",
     packages=setuptools.find_packages(),
+    include_package_data=True,
+    package_data={'': ['text_to_x.test_data': ['*.txt']]},
     # external packages as dependencies
     install_requires=['numpy', 'pandas',
                       'stanza',

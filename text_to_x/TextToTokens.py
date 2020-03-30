@@ -13,7 +13,7 @@ from text_to_x.methods.flair_ner import flair_tagger_ttt
 
 
 class TextToTokens(TextToX):
-    def __init__(self, lang=False,
+    def __init__(self, lang=None,
                  tokenize="stanza",
                  lemmatize="stanza",
                  stemming=None,

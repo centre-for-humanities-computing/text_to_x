@@ -1,7 +1,7 @@
 
 import pandas as pd
 
-from text_to_x.text_to_tokens import TextToTokens
+from text_to_x.TextToTokens import TextToTokens
 
 
 def extract_concordance(preprocessed_texts, tokens, type_token="token",

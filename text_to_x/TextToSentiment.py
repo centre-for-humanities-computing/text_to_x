@@ -13,7 +13,7 @@ from text_to_x.TextToX import TextToX
 
 
 class TextToSentiment(TextToX):
-    def __init__(self, lang=None, method="dictionary", type_token=None,
+    def __init__(self, lang=None, method="mult_bert", type_token=None,
                  detect_lang_fun="polyglot", **kwargs):
         """
         lang (str): language code, if None language is detected using
@@ -63,7 +63,7 @@ class TextToSentiment(TextToX):
                 raise TypeError(f"When 'texts' is a list, it must contain \
                     strings only.")
             self._detect_language(texts)
-        return self.method(texts, tokenlist)
+        return self.method(texts=texts, tokenlist=tokenlist)
 
     def __get_sent_dict(self, texts, tokenlist):
         if isinstance(self.lang, str):
@@ -123,7 +123,11 @@ if __name__ == "__main__":
     df = tts.texts_to_sentiment(texts)
     df
 
-    # with TextToDf
+    tts = TextToSentiment(lang="da", method="mult_bert")
+    df = tts.texts_to_sentiment(texts)
+    df
+
+    # with TextToTokens
     ttt = TextToTokens()
     ttt.texts_to_tokens(texts)
 

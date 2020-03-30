@@ -5,7 +5,7 @@
 import pandas as pd
 from collections import Counter
 
-from text_to_x.text_toTextToTokens_tokens import TextToTokens
+from text_to_x.TextToTokens import TextToTokens
 from text_to_x.TextToX import TextToX
 
 

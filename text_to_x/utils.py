@@ -94,17 +94,26 @@ def add_module_to_path(module="text_to_x"):
     sys.path.append(path)
 
 
+ p = os.path.dirname(os.path.abspath(__file__))
+path_n = max([i for i, d in enumerate(p.split("/")) if d == "text_to_x"])
+path = "/".join(p.split("/")[:path_n+1])
+read_path = path + "/test_data/fyrtårnet.txt"
+with open(path + "/test_data/fyrtårnet.txt", "r") as f:
+    ft = f.read()
+with open(path + "/test_data/origin_of_species.txt", "r") as f:
+    oos = f.read()
 def get_test_data(data="fyrtårnet", short_splits=True):
     """
     data ('fyrtårnet'|'origin_of_species')
     """
-    p = os.path.dirname(os.path.abspath(__file__))
-    path_n = max([i for i, d in enumerate(p.split("/")) if d == "text_to_x"])
-    path = "/".join(p.split("/")[:path_n+1])
 
-    read_path = path + "/test_data/" + data + ".txt"
-    with open(read_path, "r") as f:
-        text = f.read()
+    if data == 'fyrtårnet':
+        text = ft
+    elif data == 'origin_of_species':
+        text = oos
+    else:
+        ValueError(f"{data} is not a valid argument for data.")
+
 
     if short_splits is True:
         # just some splits som that the text aren't huge

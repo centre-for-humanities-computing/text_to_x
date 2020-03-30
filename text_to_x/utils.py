@@ -94,18 +94,28 @@ def add_module_to_path(module="text_to_x"):
     sys.path.append(path)
 
 
-def get_test_data():
-    with open("test_data/fyrtårnet.txt", "r") as f:
+def get_test_data(data="fyrtårnet", short_splits=True):
+    """
+    data ('fyrtårnet'|'origin_of_species')
+    """
+    p = os.path.dirname(os.path.abspath(__file__))
+    path_n = max([i for i, d in enumerate(p.split("/")) if d == "text_to_x"])
+    path = "/".join(p.split("/")[:path_n])
+
+    read_path = path + "/test_data/" + data + ".txt"
+    with open(read_path, "r") as f:
         text = f.read()
 
-    # just some splits som that the text aren't huge
-    t1 = "\n".join([t for t in text.split("\n")[1:50] if t])
-    t2 = "\n".join([t for t in text.split("\n")[50:100] if t])
-    t3 = "\n".join([t for t in text.split("\n")[100:150] if t])
+    if short_splits is True:
+        # just some splits som that the text aren't huge
+        t1 = "\n".join([t for t in text.split("\n")[1:50] if t])
+        t2 = "\n".join([t for t in text.split("\n")[50:100] if t])
+        t3 = "\n".join([t for t in text.split("\n")[100:150] if t])
 
-    # we will test it using a list but a single text will work as well
-    texts = [t1, t2, t3]
-    return texts
+        # we will test it using a list but a single text will work as well
+        texts = [t1, t2, t3]
+        return texts
+    return text
 
 
 # Example of typecheck

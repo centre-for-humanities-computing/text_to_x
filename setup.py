@@ -22,6 +22,7 @@ setuptools.setup(
                       'polyglot',  # for language detection
                       'nltk',  # for stemming
                       'tensorflow',  # for keras text to sequence
+                      'gensim', 'pyLDAvis',  # for topic modelling
                       'transformers==2.4.1', 'flair'],  # for flair
 
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers

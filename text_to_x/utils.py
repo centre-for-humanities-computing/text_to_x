@@ -100,7 +100,7 @@ def get_test_data(data="fyrtårnet", short_splits=True):
     """
     p = os.path.dirname(os.path.abspath(__file__))
     path_n = max([i for i, d in enumerate(p.split("/")) if d == "text_to_x"])
-    path = "/".join(p.split("/")[:path_n])
+    path = "/".join(p.split("/")[:path_n+1])
 
     read_path = path + "/test_data/" + data + ".txt"
     with open(read_path, "r") as f:

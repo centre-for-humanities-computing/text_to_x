@@ -89,6 +89,7 @@ class TextTo(TextToX):
         stage
 
         Note: Overwrites previous preprocessing!
+        # TODO: fix this function
         """
 
         if self.is_preprocessed:
@@ -260,5 +261,3 @@ if __name__ == "__main__":
     df = tt.get_sentiments()
     # Topic modeling
     # tt.model_topics()
-
-

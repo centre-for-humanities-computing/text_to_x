@@ -2,5 +2,6 @@
     "python.pythonPath": "/Users/au561649/.virtualenvs/text_to_x/bin/python",
     "python.linting.pylintEnabled": false,
     "python.linting.flake8Enabled": true,
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    "python.formatting.provider": "black"
 }

@@ -1,5 +1,5 @@
 # Text to X
-An quick an easy to use NLP pipeline
+You shouldn't text to your X but you should extract from text. Text To X, a quick an easy to use NLP pipeline for converting text to topics, tokens, sentiment and more.
 
 ---
 ## 🔧 Installation

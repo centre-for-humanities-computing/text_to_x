@@ -268,26 +268,26 @@ class TextToTokens(TextToX):
 
             idx_offset = np.insert(hashtag_idx, 0, False)[:-1]
             # add hashtag to token
-            df['token'][idx_offset] = '#' + df['token'][idx_offset]
-            df['lemma'][idx_offset] = '#' + df['lemma'][idx_offset]
+            df.loc[idx_offset, ['token']] = '@' + df.loc[idx_offset, ['token']]
+            df.loc[idx_offset, ['lemma']] = '@' + df.loc[idx_offset, ['lemma']]
             # remove hashtag columns
             df = df.loc[np.invert(hashtag_idx)]
             hashtag_idx = np.array(df['token'].str.match(hash_pattern))
-            df['ner'][hashtag_idx] = "HASHTAG"
+            df.loc[hashtag_idx, ['ner']] = "HASHTAG"
 
             at_idx = np.array(df['token'] == "@")
             idx_offset = np.insert(at_idx, 0, False)[:-1]
-            df['token'][idx_offset] = '@' + df['token'][idx_offset]
-            df['lemma'][idx_offset] = '@' + df['lemma'][idx_offset]
+            df.loc[idx_offset, ['token']] = '@' + df.loc[idx_offset, ['token']]
+            df.loc[idx_offset, ['lemma']] = '@' + df.loc[idx_offset, ['lemma']]
             df = df.loc[np.invert(at_idx)]
             at_idx = np.array(df['token'].str.match(at_pattern))
             df['ner'][at_idx] = "TWITTER_USER"
 
             emoji_idx = np.array(df['token'].str.match(emoji_pattern))
-            df['upos'][emoji_idx] = "SYM_EMOJI"
+            df.loc[emoji_idx, ['upos']] = "SYM_EMOJI"
 
             url_idx = np.array(df['token'].str.match(url_pattern))
-            df['ner'][url_idx] = "URL"
+            df.loc[url_idx, ['ner']] = "URL"
             self.__dfs[i] = df
 
 

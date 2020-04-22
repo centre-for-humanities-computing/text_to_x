@@ -159,7 +159,7 @@ class SentiText(object):
     Identify sentiment-relevant string-level properties of input text.
     """
 
-    def __init__(self, text, tokenlist = None):
+    def __init__(self, text, tokenlist=None):
         if not isinstance(text, str):
             text = str(text).encode('utf-8')
         self.text = text
@@ -231,7 +231,7 @@ class SentimentIntensityAnalyzer(object):
             emoji_dict[emoji] = description
         return emoji_dict
 
-    def polarity_scores(self, text, tokenlist = None):
+    def polarity_scores(self, text, tokenlist=None):
         """
         Return a float for sentiment strength based on the input text.
         Positive values are positive valence, negative value are negative

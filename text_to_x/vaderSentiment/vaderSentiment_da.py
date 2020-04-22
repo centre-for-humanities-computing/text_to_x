@@ -1,6 +1,7 @@
 # coding: utf-8
 """
 A Danish version of Vader
+Dictionary by SentiDA
 """
 
 # Author: C.J. Hutto
@@ -41,7 +42,18 @@ NEGATE = \
     ['ikke', 'ik', 'ikk', 'ik\'', 'aldrig', 'ingen']
 
 BOOSTER_DICT = \
-    {"temmelig": 0.1, "meget": 0.2, "mega": 0.4, "lidt": -0.2, "ekstremt": 0.4,
+    {"absolut": B_INCR, "utroligt": B_INCR, "vældigt": B_INCR,
+     "helt": B_INCR, "betydende": B_INCR, "betydligt": B_INCR,
+     "bestemt": B_INCR, "enorm": B_INCR, "enormt": B_INCR, "specielt": B_INCR,
+     "ekseptionelt": B_INCR, "extrem": B_INCR, "extremt": B_INCR,
+     "yderst": B_INCR, "fantastisk": B_INCR, "flipping": B_INCR,
+     "flippin": B_INCR, "frackin": B_INCR, "fracking": B_INCR,
+     "fricking": B_INCR, "frickin": B_INCR, "frigging": B_INCR,
+     "friggin": B_INCR, "fuckin": B_INCR, "fucking": B_INCR,
+     "fuggin": B_INCR, "fugging": B_INCR, "hella": B_INCR, 
+     "intensivt": B_INCR, "mest": B_INCR, "særskilt": B_INCR, "ganske": B_INCR,
+     "væsentligt": B_INCR, "total": B_INCR, "uber": B_INCR,
+     "temmelig": 0.1, "meget": 0.2, "mega": 0.4, "lidt": -0.2, "ekstremt": 0.4,
      "totalt": 0.2, "utrolig": 0.3, "rimelig": 0.1, "seriøst": 0.3}
 
 # check for sentiment laden idioms that do not contain lexicon words (future work, not yet implemented)

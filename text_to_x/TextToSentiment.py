@@ -10,6 +10,8 @@ from text_to_x.vaderSentiment.vaderSentiment_da import \
     SentimentIntensityAnalyzer as Sentiment_da
 from text_to_x.vaderSentiment.vaderSentiment_se import \
     SentimentIntensityAnalyzer as Sentiment_se
+from text_to_x.vaderSentiment.vaderSentiment_no import \
+    SentimentIntensityAnalyzer as Sentiment_no
 from text_to_x.TextToTokens import TextToTokens
 from text_to_x.TextToX import TextToX
 
@@ -109,6 +111,9 @@ class TextToSentiment(TextToX):
             self.__dict_model[lang] = analyser.polarity_scores
         elif lang == "se":
             analyser = Sentiment_se()
+            self.__dict_model[lang] = analyser.polarity_scores
+        elif lang == "no":
+            analyser = Sentiment_no()
             self.__dict_model[lang] = analyser.polarity_scores
         else:
             raise ValueError("Language {lang} does not have a dictionary \

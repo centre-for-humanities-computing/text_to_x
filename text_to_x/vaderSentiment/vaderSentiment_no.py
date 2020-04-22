@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-An swedish version of Vader, fetched from pypi
+a norwegian version of Vader, dictionary by Finn A. Nielsen https://github.com/olavski/afinn/blob/master/afinn/data/AFINN-no-165.txt
 """
 
 # Author: C.J. Hutto
@@ -35,13 +35,14 @@ B_DECR = -0.293
 C_INCR = 0.733
 N_SCALAR = -0.74
 
+# derived from danish
 NEGATE = \
-    ["inte", "varken", "aldrig", "ingen", "nej", "ingenting", "ingenstans", "utan",
-    "sällan", "trots"]
+    ['ikke', 'ik', 'ikk', 'ik\'', 'aldrig', 'ingen']
 
 # booster/dampener 'intensifiers' or 'degree adverbs'
 # http://en.wiktionary.org/wiki/Category:English_degree_adverbs
 
+# derived from danish and swedish
 BOOSTER_DICT = \
     {"absolut": B_INCR, "otroligt": B_INCR, "väldigt": B_INCR,
      "helt": B_INCR, "betydande": B_INCR, "betydligt": B_INCR,
@@ -62,16 +63,15 @@ BOOSTER_DICT = \
      "ungefär": B_DECR, "någorlunda": B_DECR,
      "mindre": B_DECR, "lite": B_DECR, "litet": B_DECR,
      "ibland": B_DECR, "stundvis": B_DECR, "delvis": B_DECR,
-     "sällsynt": B_DECR, "då och då": B_DECR, "viss": B_DECR}
+     "sällsynt": B_DECR, "då och då": B_DECR, "viss": B_DECR,
+     "temmelig": 0.1, "meget": 0.2, "mega": 0.4, "lidt": -0.2, "ekstremt": 0.4,
+     "totalt": 0.2, "utrolig": 0.3, "rimelig": 0.1, "seriøst": 0.3}
 
 # check for sentiment laden idioms that do not contain lexicon words (future work, not yet implemented)
-SENTIMENT_LADEN_IDIOMS = {"skär senapen": 2, "hand till mun": -2,
-                          "ta ett bloss": -2, "blossa": -2,
-                          "bryt ett ben": 2}
+SENTIMENT_LADEN_IDIOMS = {}
 
 # check for special case idioms containing lexicon words
-SPECIAL_CASE_IDIOMS = {"the shit": 3, "the bomb": 3, "bad ass": 1.5, "badass": 1.5,
-                       "yeah right": -2, "att dö för": 3}
+SPECIAL_CASE_IDIOMS = {}
 
 
 # #Static methods# #
@@ -191,7 +191,7 @@ class SentimentIntensityAnalyzer(object):
     Give a sentiment intensity score to sentences.
     """
 
-    def __init__(self, lexicon_file="vader_lexicon_se.txt", emoji_lexicon="emoji_utf8_lexicon.txt"):
+    def __init__(self, lexicon_file="vader_lexicon_no.txt", emoji_lexicon="emoji_utf8_lexicon.txt"):
         _this_module_file_path_ = os.path.abspath(getsourcefile(lambda: 0))
         lexicon_full_filepath = os.path.join(os.path.dirname(_this_module_file_path_), lexicon_file)
         with codecs.open(lexicon_full_filepath, encoding='utf-8') as f:

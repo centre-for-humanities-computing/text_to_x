@@ -35,16 +35,14 @@ B_DECR = -0.293
 C_INCR = 0.733
 N_SCALAR = -0.74
 
-# derived from danish
 NEGATE = \
     ['ikke', 'ik', 'ikk', 'ik\'', 'aldrig', 'ingen']
 
 # booster/dampener 'intensifiers' or 'degree adverbs'
 # http://en.wiktionary.org/wiki/Category:English_degree_adverbs
 
-# derived from danish and swedish
 BOOSTER_DICT = \
-   {'Temmelig ': 0.293,
+   {'Temmelig ': 0.293,  # bokmål
     'Meget ': 0.293,
     'Mega': 0.293,
     'Litt': 0.293,
@@ -117,7 +115,36 @@ BOOSTER_DICT = \
     'Sjelden(t)': -0.293,
     'Nå og da': -0.293,
     'Av og til': -0.293,
-    'Vist': -0.293}
+    'Vist': -0.293,
+    'Mykje': 0.293,  # nynorsk
+    'Utruleg': 0.293,
+    'Bestemd': 0.293,
+    'Heilt': 0.293,
+    'Betydeleg': 0.293,
+    'Framfor alt': 0.293,
+    'Uvanleg': 0.293,
+    'Yttarst': 0.293,
+    'Høgt': 0.293,
+    'Høgst': 0.293,
+    'Særs': 0.293,
+    'Serdeles': 0.293,
+    'Sers': 0.293,
+    'Sjukt': 0.293,
+    'Meir': 0.293,
+    'Særleg': 0.293,
+    'Usadvenleg': 0.293,
+    'Utpreget': 0.293,
+    'Ekstra': 0.293,
+    'Berre': 0.293,
+    'Vesentleg': 0.293,
+    'Gjennomgåande': 0.293,
+    'Sværande': 0.293,
+    'Noko': -0.293,
+    'So vidt': -0.293,
+    'Nokoleis': -0.293,
+    'Nokolunde': -0.293,
+    'Sjeldan': -0.293,
+    'No og da': -0.293}
 
 
 # check for sentiment laden idioms that do not contain lexicon words (future work, not yet implemented)

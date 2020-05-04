@@ -111,8 +111,8 @@ df = tts.texts_to_sentiment(ttt)
 ---
 ## 🚧 Future improvements
 In estimated order
-- [ ] Make a class TextToTopic for topic modelling using gensim mallet and LDA
-- [ ] add fast a fast tokenizer for TextToTokens
+- [x] Make a class TextToTopic for topic modelling using gensim mallet and LDA
+- [x] add fast a fast tokenizer for TextToTokens
 - [x] Add entity tagger
     - [x] add entity tagger for Danish
 - [x] Update TextToDf to use Stanza instead of stanfordnlp

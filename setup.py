@@ -22,8 +22,6 @@ setuptools.setup(
     # external packages as dependencies
     install_requires=['numpy', 'pandas',
                       'stanza',
-                      # for language detection
-                      'polyglot', 'morfessor', 'pyicu', 'pycld2',
                       'nltk',  # for stemming
                       'umap-learn',
                       'tensorflow',  # for keras text to sequence

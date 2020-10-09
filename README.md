@@ -12,6 +12,8 @@ To reinstall the package use the following code
 pip3 install --force-reinstall --no-deps  git+https://github.com/centre-for-humanities-computing/text_to_x
 ```
 
+Please note that polyglot is required for language detection, but have been removed from dependencies multiple installation issues. We thus leave the installation of polyglot to the user and refer question regarding the installation to the polyglot forum. text_to_x works without polyglot as long as language is specified.
+
 ---
 ## 📖 Tokenization and token tagging
 Tokenization and token tagging utilized stanza, flair and keras for tokenization, lemmatization, pos-tagging, dependency parsing and NER-tagging.

@@ -142,7 +142,7 @@ class TextToTokens(TextToX):
                 raise ValueError(f"{key} should be None, a str or a function,\
                                    not an instance of type {type(procss)}")
 
-    def texts_to_tokens(self, texts, silent=True):
+    def texts_to_tokens(self, texts, n_cores=None, silent=True):
         """
         texts (str|list): Should be a string, a list or other iterable object
         silent (bool): should the function be silent defaults to False

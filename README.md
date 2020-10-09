@@ -12,6 +12,8 @@ To reinstall the package use the following code
 pip3 install --force-reinstall --no-deps  git+https://github.com/centre-for-humanities-computing/text_to_x
 ```
 
+Please note that polyglot is required for language detection, but have been removed from dependencies multiple installation issues. We thus leave the installation of polyglot to the user and refer question regarding the installation to the polyglot forum. text_to_x works without polyglot as long as language is specified.
+
 ---
 ## 📖 Tokenization and token tagging
 Tokenization and token tagging utilized stanza, flair and keras for tokenization, lemmatization, pos-tagging, dependency parsing and NER-tagging.
@@ -84,15 +86,21 @@ Text to X utilized an altered version of a dictionary or a multilingual BERT. Fo
 ### Example of use
 The simple use case is (using the same texts as above):
 ```
-tts = ttx.TextToSentiment(lang = "da", method="dictionary")
+tts = TextToSentiment(lang="da", method="danlp_bert_tone")
 df = tts.texts_to_sentiment(texts)
 print(df)
+
 ```
+
+tts = TextToSentiment(lang="da", method="danlp_bert_tone")
+df = tts.texts_to_sentiment(texts)
+df
+
 ```
-neg    neu    pos  compound
-0  0.060  0.851  0.089    0.9794
-1  0.064  0.826  0.109    0.9973
-2  0.031  0.780  0.189    0.9615
+   polarity_pos  polarity_neu  polarity_neg  analytic_obj  analytic_subj
+0      0.002590      0.003864      0.993547      0.999044       0.000956
+1      0.082117      0.027139      0.890743      0.999934       0.000066
+2      0.349517      0.565464      0.085019      0.999946       0.000055
 ```
 
 If we want to use it with TextToTokens we can do as follow:

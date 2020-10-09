@@ -264,17 +264,21 @@ class TextToTokens(TextToX):
         url_pattern = re.compile(r'(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})')
 
         for i, df in enumerate(self.__dfs):
+            # ID of rows containing nothing but #
             hashtag_idx = np.array(df['token'] == "#")
-
+            # ID of rows after a tag
             idx_offset = np.insert(hashtag_idx, 0, False)[:-1]
             # add hashtag to token
-            df.loc[idx_offset, ['token']] = '@' + df.loc[idx_offset, ['token']]
-            df.loc[idx_offset, ['lemma']] = '@' + df.loc[idx_offset, ['lemma']]
+            df.loc[idx_offset, ['token']] = '#' + df.loc[idx_offset, ['token']]
+            df.loc[idx_offset, ['lemma']] = '#' + df.loc[idx_offset, ['lemma']]
             # remove hashtag columns
             df = df.loc[np.invert(hashtag_idx)]
+            # tag remaining hashtags with the re pattern
             hashtag_idx = np.array(df['token'].str.match(hash_pattern))
+            # save ner tag
             df.loc[hashtag_idx, ['ner']] = "HASHTAG"
 
+            # same procedure as above, only with @
             at_idx = np.array(df['token'] == "@")
             idx_offset = np.insert(at_idx, 0, False)[:-1]
             df.loc[idx_offset, ['token']] = '@' + df.loc[idx_offset, ['token']]
@@ -283,9 +287,11 @@ class TextToTokens(TextToX):
             at_idx = np.array(df['token'].str.match(at_pattern))
             df['ner'][at_idx] = "TWITTER_USER"
 
+            # match emojis
             emoji_idx = np.array(df['token'].str.match(emoji_pattern))
             df.loc[emoji_idx, ['upos']] = "SYM_EMOJI"
 
+            # match urls
             url_idx = np.array(df['token'].str.match(url_pattern))
             df.loc[url_idx, ['ner']] = "URL"
             self.__dfs[i] = df

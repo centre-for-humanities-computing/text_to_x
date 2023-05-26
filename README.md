@@ -1,4 +1,7 @@
 # Text to X
+
+__Note__: We don't recommend using this package and have this archived it. A lot of these things can be solved using other packages such as asent, spacy etc. 
+
 You shouldn't text to your X but you should extract from text. Text To X, a quick an easy to use NLP pipeline for converting text to topics, tokens, sentiment and more.
 
 ---
